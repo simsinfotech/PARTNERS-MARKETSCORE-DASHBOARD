@@ -1176,6 +1176,165 @@ body::before {
 @media (max-width: 600px) {
   .mu-input, .mu-select { min-width: 100%; }
 }
+
+/* ─── Funds / Payouts Page ─── */
+.funds-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+
+.funds-tab {
+  padding: 10px 20px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text3);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.funds-tab:hover { color: var(--text2); }
+.funds-tab.active {
+  color: var(--text);
+  border-bottom-color: var(--green);
+}
+
+.funds-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 800px) {
+  .funds-layout { grid-template-columns: 1fr; }
+}
+
+.funds-form-area {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.funds-field { margin-bottom: 20px; }
+
+.funds-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 8px;
+}
+
+.funds-select {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235A7090' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+
+.funds-select:focus { border-color: var(--green); }
+.funds-select option { background: var(--bg2); color: var(--text); }
+
+.funds-input-wrap { position: relative; }
+
+.funds-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.funds-input:focus { border-color: var(--green); }
+.funds-input::placeholder { color: var(--text3); }
+
+.funds-input-hint {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: var(--text3);
+  pointer-events: none;
+}
+
+.funds-field-note {
+  font-size: 12px;
+  color: var(--red);
+  margin-top: 6px;
+}
+
+.funds-submit {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--green);
+  color: var(--bg);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.funds-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 30px rgba(0,229,160,0.3);
+}
+
+.funds-info {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.funds-info-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.funds-info-text {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.7;
+}
+
+.funds-info-list {
+  list-style: disc;
+  padding-left: 20px;
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.8;
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
@@ -1695,6 +1854,110 @@ body::before {
       </div>
     </div><!-- /page-myusers -->
 
+    <!-- ═══ PAYOUTS PAGE ═══ -->
+    <div id="page-payouts" style="display:none">
+      <div class="header">
+        <div>
+          <h1 class="display">Funds</h1>
+          <p style="font-size:13px;color:var(--text3);margin-top:4px">Manage withdrawals, transfers, and view transaction history</p>
+        </div>
+      </div>
+
+      <!-- Funds Tabs -->
+      <div class="funds-tabs">
+        <button class="funds-tab active" onclick="switchFundsTab('withdraw', this)">Withdraw</button>
+        <button class="funds-tab" onclick="switchFundsTab('transfer', this)">Transfer</button>
+        <button class="funds-tab" onclick="switchFundsTab('history', this)">History</button>
+      </div>
+
+      <div class="funds-layout">
+        <!-- Left: Form area -->
+        <div class="funds-form-area">
+
+          <!-- ── Withdraw Tab ── -->
+          <div id="funds-withdraw" class="funds-panel">
+            <div class="funds-field">
+              <label class="funds-label">Account <span style="color:var(--red)">*</span></label>
+              <select class="funds-select" id="withdrawAccount">
+                <option>Commission Wallet / 0.75 USD</option>
+              </select>
+            </div>
+            <div class="funds-field">
+              <label class="funds-label">Amount <span style="color:var(--red)">*</span></label>
+              <div class="funds-input-wrap">
+                <input type="number" class="funds-input" id="withdrawAmount" placeholder="Enter Withdraw Amount" min="30" />
+                <span class="funds-input-hint">Minimal 30 USD</span>
+              </div>
+              <div class="funds-field-note" id="withdrawNote">Please enter withdraw amount</div>
+            </div>
+            <button class="funds-submit" onclick="handleWithdraw()">Next</button>
+          </div>
+
+          <!-- ── Transfer Tab ── -->
+          <div id="funds-transfer" class="funds-panel" style="display:none">
+            <div class="funds-field">
+              <label class="funds-label">From Account <span style="color:var(--red)">*</span></label>
+              <select class="funds-select">
+                <option>Commission Wallet / 0.75 USD</option>
+              </select>
+            </div>
+            <div class="funds-field">
+              <label class="funds-label">To Account <span style="color:var(--red)">*</span></label>
+              <select class="funds-select">
+                <option>Trading Wallet</option>
+              </select>
+            </div>
+            <div class="funds-field">
+              <label class="funds-label">Amount <span style="color:var(--red)">*</span></label>
+              <div class="funds-input-wrap">
+                <input type="number" class="funds-input" placeholder="Enter Transfer Amount" min="1" />
+                <span class="funds-input-hint">Minimal 1 USD</span>
+              </div>
+            </div>
+            <button class="funds-submit">Next</button>
+          </div>
+
+          <!-- ── History Tab ── -->
+          <div id="funds-history" class="funds-panel" style="display:none">
+            <div class="mu-table-wrap" style="margin-bottom:0">
+              <table class="mu-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="5" style="text-align:center;padding:48px 16px;color:var(--text3)">
+                      <div style="font-size:32px;margin-bottom:12px">📭</div>
+                      <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:4px">No transaction history</div>
+                      <div style="font-size:12px">Your withdrawal and transfer records will appear here</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right: Info panel -->
+        <div class="funds-info" id="fundsInfoPanel">
+          <div class="funds-info-title">Withdrawal Processing Time</div>
+          <p class="funds-info-text">The withdrawal processing time is Monday to Friday, 03:00 AM to 5:00 PM (GMT+2). Any withdrawal requests submitted after 5:00PM (GMT+2) will be processed on the next business day.</p>
+          <div class="funds-info-title" style="margin-top:20px">Minimum Withdrawal Amount per Transaction</div>
+          <ul class="funds-info-list">
+            <li>Wire Transfer: USD 100</li>
+            <li>Other Methods: USD 30</li>
+          </ul>
+        </div>
+      </div>
+    </div><!-- /page-payouts -->
+
   </main>
 </div>
 
@@ -1906,6 +2169,31 @@ function switchPage(page) {
   // Close mobile sidebar
   document.querySelector('.sidebar').classList.remove('open');
   document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+function switchFundsTab(tab, el) {
+  document.querySelectorAll('.funds-panel').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.funds-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('funds-' + tab).style.display = 'block';
+  el.classList.add('active');
+  // Hide info panel on history tab, show on others
+  var info = document.getElementById('fundsInfoPanel');
+  if (info) info.style.display = tab === 'history' ? 'none' : 'block';
+  // Make history tab full width
+  var layout = document.querySelector('.funds-layout');
+  if (layout) layout.style.gridTemplateColumns = tab === 'history' ? '1fr' : '';
+}
+
+function handleWithdraw() {
+  var amt = document.getElementById('withdrawAmount').value;
+  var note = document.getElementById('withdrawNote');
+  if (!amt || parseFloat(amt) < 30) {
+    note.textContent = 'Minimum withdrawal amount is 30 USD';
+    note.style.display = 'block';
+    return;
+  }
+  note.textContent = '';
+  alert('Withdrawal request for $' + amt + ' submitted. This feature will be connected to a backend.');
 }
 
 function setTab(el) {
