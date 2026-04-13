@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MarketScore — Partner Dashboard</title>
+<link rel="icon" type="image/png" href="marketscore logo.png" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #05080F;
+  --bg2: #080D18;
+  --surface: #0D1424;
+  --card: #111A2E;
+  --card-hover: #142036;
+  --border: rgba(255,255,255,0.06);
+  --border-h: rgba(255,255,255,0.12);
+  --green: #00E5A0;
+  --green-glow: rgba(0,229,160,0.15);
+  --green-dim: rgba(0,229,160,0.06);
+  --red: #FF4D6A;
+  --red-dim: rgba(255,77,106,0.08);
+  --gold: #FFB830;
+  --gold-dim: rgba(255,184,48,0.08);
+  --blue: #4DA6FF;
+  --blue-dim: rgba(77,166,255,0.08);
+  --purple: #A78BFA;
+  --purple-dim: rgba(167,139,250,0.08);
+  --text: #F0F4F8;
+  --text2: #A0B4CC;
+  --text3: #5A7090;
+  --bronze: #cd7f32;
+  --silver: #c0c0c0;
+  --diamond: #b9f2ff;
+  --plat: #e5e4e2;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+.mono { font-family: 'JetBrains Mono', monospace; }
+.display { font-family: 'Outfit', sans-serif; }
+
+/* Animated background grid */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,229,160,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,160,0.015) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Layout */
+.layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .sidebar-mobile { display: flex !important; }
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 240px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+  overflow-y: auto;
+}
+
+.sidebar-mobile {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  z-index: 50;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  backdrop-filter: blur(20px);
+}
+
+.sb-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.sb-logo img {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.sb-logo span {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: -0.5px;
+}
+
+.sb-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+
+.sb-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.sb-item:hover {
+  color: var(--text2);
+  background: rgba(255,255,255,0.03);
+}
+
+.sb-item.active {
+  color: var(--green);
+  background: var(--green-dim);
+  border-color: rgba(0,229,160,0.1);
+}
+
+.sb-item .icon { font-size: 16px; width: 20px; text-align: center; }
+
+.sb-user {
+  margin-top: auto;
+  padding: 14px 12px;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.sb-user-name { font-weight: 600; font-size: 13px; margin-bottom: 2px; }
+.sb-user-email { font-size: 11px; color: var(--text3); }
+.sb-user-tier {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(192,192,192,0.08);
+  color: var(--silver);
+}
+
+/* Main content */
+.main {
+  grid-column: 2;
+  padding: 28px 32px 60px;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 900px) {
+  .main {
+    grid-column: 1;
+    padding: 80px 16px 60px;
+  }
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.header h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.header-right { display: flex; align-items: center; gap: 10px; }
+
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  background: var(--green-dim);
+  border: 1px solid rgba(0,229,160,0.15);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--green);
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(0,229,160,0.05); }
+  50% { box-shadow: 0 0 40px rgba(0,229,160,0.12); }
+}
+
+/* Referral Card */
+.ref-card {
+  background: linear-gradient(135deg, var(--surface), rgba(0,229,160,0.03));
+  border: 1px solid rgba(0,229,160,0.15);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  animation: glowPulse 4s ease-in-out infinite;
+}
+
+.ref-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
+
+.ref-code {
+  font-family: 'Outfit', sans-serif;
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  background: linear-gradient(135deg, var(--green), #00b4d8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ref-link {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 4px;
+}
+
+.ref-link b { color: var(--text2); font-weight: 600; }
+
+.ref-btns { display: flex; gap: 8px; }
+
+.btn {
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s;
+}
+
+.btn-primary {
+  background: var(--green);
+  color: var(--bg);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(0,229,160,0.25);
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: var(--border-h);
+}
+
+/* Tier progress */
+.tier-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  transition: border-color 0.3s;
+}
+
+.tier-card:hover { border-color: var(--border-h); }
+
+.tier-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px;
+  border-radius: var(--radius-xs);
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.tier-info {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+.tier-info b { color: var(--text); font-weight: 700; }
+
+.tier-progress { width: 200px; }
+
+@media (max-width: 600px) { .tier-progress { width: 100%; } }
+
+.tier-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
+
+.tier-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.04);
+  overflow: hidden;
+  position: relative;
+}
+
+.tier-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.tier-bar-fill::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3));
+  border-radius: 0 4px 4px 0;
+}
+
+/* Stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 700px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.stat-card:hover {
+  border-color: var(--border-h);
+  transform: translateY(-2px);
+}
+
+.stat-card:hover::before { opacity: 1; }
+
+.stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 10px;
+}
+
+.stat-value {
+  font-family: 'Outfit', sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 4px;
+  animation: countUp 0.6s ease-out;
+}
+
+.stat-change {
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-change.up { color: var(--green); }
+.stat-change.down { color: var(--red); }
+
+/* Section headers */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.tab-group { display: flex; gap: 4px; }
+
+.tab {
+  padding: 6px 14px;
+  border-radius: var(--radius-xs);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  font-family: 'Space Grotesk', sans-serif;
+  transition: all 0.2s;
+}
+
+.tab.active {
+  background: rgba(255,255,255,0.07);
+  color: var(--text);
+}
+
+.tab:hover:not(.active) {
+  color: var(--text2);
+}
+
+/* Chart */
+.chart-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.chart-card:hover { border-color: var(--border-h); }
+
+/* Table */
+.table-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 24px;
+  transition: border-color 0.3s;
+}
+
+.table-card:hover { border-color: var(--border-h); }
+
+.tbl-header, .tbl-row {
+  display: grid;
+  grid-template-columns: 2.4fr 1fr 1fr 1.2fr 0.8fr;
+  gap: 8px;
+  padding: 14px 24px;
+  font-size: 13px;
+  align-items: center;
+}
+
+@media (max-width: 700px) {
+  .tbl-header, .tbl-row {
+    grid-template-columns: 1.8fr 1fr 1fr;
+    font-size: 12px;
+    padding: 12px 16px;
+  }
+  .tbl-header > *:nth-child(4),
+  .tbl-header > *:nth-child(5),
+  .tbl-row > *:nth-child(4),
+  .tbl-row > *:nth-child(5) { display: none; }
+}
+
+.tbl-header {
+  border-bottom: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+
+.tbl-row {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+
+.tbl-row:last-child { border-bottom: none; }
+.tbl-row:hover { background: rgba(255,255,255,0.015); }
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--bg);
+  flex-shrink: 0;
+}
+
+.user-name { font-weight: 600; font-size: 13px; }
+.user-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+
+.badge {
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: var(--radius-xs);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge-active { background: var(--green-dim); color: var(--green); }
+.badge-inactive { background: var(--red-dim); color: var(--red); }
+.badge-new { background: var(--blue-dim); color: var(--blue); }
+
+/* Payout rows */
+.payout-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+
+.payout-row:last-child { border-bottom: none; }
+.payout-row:hover { background: rgba(255,255,255,0.015); }
+
+.payout-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.payout-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.payout-label { font-size: 14px; font-weight: 600; }
+.payout-date { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+.payout-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.payout-amt {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.payout-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--radius-xs);
+}
+
+/* Tier Roadmap */
+.roadmap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.roadmap-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.rm-tier {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+  transition: all 0.2s;
+}
+
+.rm-tier.current {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-h);
+}
+
+.rm-tier.locked { opacity: 0.4; }
+.rm-tier.done { opacity: 0.6; }
+
+.rm-icon { font-size: 22px; width: 32px; text-align: center; }
+.rm-name { font-size: 14px; font-weight: 700; min-width: 80px; }
+.rm-rate {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+  min-width: 60px;
+}
+.rm-range { font-size: 12px; color: var(--text3); flex: 1; }
+.rm-status { margin-left: auto; font-size: 16px; }
+
+/* How it works */
+.how-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.how-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.how-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.how-step {
+  padding: 18px 16px;
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  transition: all 0.3s;
+}
+
+.how-step:hover {
+  border-color: var(--border-h);
+  transform: translateY(-2px);
+}
+
+.how-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--green);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.how-step-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.how-step-desc {
+  font-size: 12px;
+  color: var(--text3);
+  line-height: 1.5;
+}
+
+/* Two column layout for bottom */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 800px) {
+  .bottom-grid { grid-template-columns: 1fr; }
+}
+
+/* Tooltip on hover */
+.stat-card[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 10px;
+  color: var(--text2);
+  white-space: nowrap;
+  z-index: 10;
+}
+
+/* Scroll animation */
+.anim-in {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: countUp 0.5s ease-out forwards;
+}
+
+.anim-in:nth-child(1) { animation-delay: 0s; }
+.anim-in:nth-child(2) { animation-delay: 0.05s; }
+.anim-in:nth-child(3) { animation-delay: 0.1s; }
+.anim-in:nth-child(4) { animation-delay: 0.15s; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <img src="marketscore logo.png" alt="MarketScore" />
+      <span class="display">MarketScore</span>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="sb-item active">
+        <span class="icon">📊</span> Dashboard
+      </div>
+      <div class="sb-item">
+        <span class="icon">👥</span> My Users
+      </div>
+      <div class="sb-item">
+        <span class="icon">💰</span> Payouts
+      </div>
+      <div class="sb-item">
+        <span class="icon">📈</span> Analytics
+      </div>
+      <div class="sb-item">
+        <span class="icon">🎨</span> Content Kit
+      </div>
+      <div class="sb-item">
+        <span class="icon">⚙️</span> Settings
+      </div>
+    </nav>
+
+    <div class="sb-user">
+      <div class="sb-user-name">John Crypto</div>
+      <div class="sb-user-email">john@example.com</div>
+      <div class="sb-user-tier">🥈 Silver Partner</div>
+    </div>
+  </aside>
+
+  <!-- Mobile Header -->
+  <div class="sidebar-mobile">
+    <div style="display:flex;align-items:center;gap:8px">
+      <img src="marketscore logo.png" alt="MS" style="width:32px;height:32px;border-radius:7px;object-fit:contain" />
+      <span class="display" style="font-weight:800;font-size:15px">MarketScore</span>
+    </div>
+    <div class="live-badge">
+      <span class="live-dot"></span> Live
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="main">
+    <!-- Header -->
+    <div class="header">
+      <div>
+        <h1 class="display">Partner Dashboard</h1>
+        <p style="font-size:13px;color:var(--text3);margin-top:4px">Welcome back, John. Here's your performance overview.</p>
+      </div>
+      <div class="header-right">
+        <div class="live-badge">
+          <span class="live-dot"></span> Live Data
+        </div>
+      </div>
+    </div>
+
+    <!-- Referral Code -->
+    <div class="ref-card anim-in">
+      <div>
+        <div class="ref-label">Your Referral Code</div>
+        <div class="ref-code">MS-JOHN</div>
+        <div class="ref-link">marketscore.app/join/<b>MS-JOHN</b></div>
+      </div>
+      <div class="ref-btns">
+        <button class="btn btn-primary" onclick="copyCode()">📋 Copy Link</button>
+        <button class="btn btn-secondary">QR Code</button>
+      </div>
+    </div>
+
+    <!-- Tier Status -->
+    <div class="tier-card anim-in">
+      <div>
+        <div class="tier-badge" style="background:rgba(192,192,192,0.08);color:var(--silver)">🥈 SILVER · $8/lot</div>
+        <div class="tier-info">You have <b>347 users</b>. Reach <b>500</b> to unlock <span style="color:var(--gold)">Gold</span> at <b>$9/lot</b>.</div>
+      </div>
+      <div class="tier-progress">
+        <div class="tier-bar-labels"><span>347</span><span>500</span></div>
+        <div class="tier-bar">
+          <div class="tier-bar-fill" style="width:69%;background:linear-gradient(90deg,var(--silver),#e8e8e8)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card anim-in" style="--delay:0s">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),transparent);opacity:0.5"></div>
+        <div class="stat-label">Total Users</div>
+        <div class="stat-value">347</div>
+        <div class="stat-change up">↑ 23 this week</div>
+      </div>
+      <div class="stat-card anim-in">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),transparent);opacity:0.5"></div>
+        <div class="stat-label">Active Traders</div>
+        <div class="stat-value">261</div>
+        <div class="stat-change up">↑ 75% active</div>
+      </div>
+      <div class="stat-card anim-in">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),transparent);opacity:0.5"></div>
+        <div class="stat-label">Total Lots</div>
+        <div class="stat-value" style="color:var(--green)">5,832</div>
+        <div class="stat-change up">↑ 14% vs last month</div>
+      </div>
+      <div class="stat-card anim-in">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),transparent);opacity:0.5"></div>
+        <div class="stat-label">Your Earnings</div>
+        <div class="stat-value" style="color:var(--gold)">$46,656</div>
+        <div class="stat-change up">↑ $4,120 this month</div>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="section-header">
+      <div class="section-title display">Earnings Over Time</div>
+      <div class="tab-group">
+        <button class="tab active" onclick="setTab(this)">7D</button>
+        <button class="tab" onclick="setTab(this)">30D</button>
+        <button class="tab" onclick="setTab(this)">90D</button>
+        <button class="tab" onclick="setTab(this)">ALL</button>
+      </div>
+    </div>
+    <div class="chart-card">
+      <svg viewBox="0 0 800 180" style="width:100%;height:180px" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="rgba(0,229,160,0.2)"/>
+            <stop offset="100%" stop-color="rgba(0,229,160,0)"/>
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <line x1="0" y1="45" x2="800" y2="45" stroke="rgba(255,255,255,0.02)"/>
+        <line x1="0" y1="90" x2="800" y2="90" stroke="rgba(255,255,255,0.02)"/>
+        <line x1="0" y1="135" x2="800" y2="135" stroke="rgba(255,255,255,0.02)"/>
+        <path d="M0,150 C60,148 120,140 180,130 C240,120 280,125 340,110 C400,95 440,100 500,80 C560,60 600,70 660,45 C720,25 760,30 800,15 L800,180 L0,180 Z" fill="url(#cg)"/>
+        <path d="M0,150 C60,148 120,140 180,130 C240,120 280,125 340,110 C400,95 440,100 500,80 C560,60 600,70 660,45 C720,25 760,30 800,15" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" filter="url(#glow)"/>
+        <circle cx="800" cy="15" r="5" fill="var(--green)"/>
+        <circle cx="800" cy="15" r="10" fill="none" stroke="var(--green)" stroke-width="1.5" opacity="0.3">
+          <animate attributeName="r" values="8;14;8" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <text x="8" y="172" fill="#5A7090" font-size="11" font-family="JetBrains Mono, monospace">Apr 5</text>
+        <text x="235" y="172" fill="#5A7090" font-size="11" font-family="JetBrains Mono, monospace">Apr 7</text>
+        <text x="485" y="172" fill="#5A7090" font-size="11" font-family="JetBrains Mono, monospace">Apr 9</text>
+        <text x="740" y="172" fill="#00E5A0" font-size="11" font-family="JetBrains Mono, monospace" font-weight="600">Today</text>
+      </svg>
+    </div>
+
+    <!-- Tier Roadmap -->
+    <div class="roadmap anim-in">
+      <div class="roadmap-title display">Your Tier Roadmap</div>
+      <div class="rm-tier done">
+        <div class="rm-icon">🥉</div>
+        <div class="rm-name" style="color:var(--bronze)">Bronze</div>
+        <div class="rm-rate">$7/lot</div>
+        <div class="rm-range">Up to 200 users</div>
+        <div class="rm-status">✅</div>
+      </div>
+      <div class="rm-tier current">
+        <div class="rm-icon">🥈</div>
+        <div class="rm-name" style="color:var(--silver)">Silver</div>
+        <div class="rm-rate">$8/lot</div>
+        <div class="rm-range">Up to 500 users · <b style="color:var(--text)">347 / 500</b></div>
+        <div class="rm-status">⬅️</div>
+      </div>
+      <div class="rm-tier locked">
+        <div class="rm-icon">🥇</div>
+        <div class="rm-name" style="color:var(--gold)">Gold</div>
+        <div class="rm-rate">$9/lot</div>
+        <div class="rm-range">Up to 1,000 users</div>
+        <div class="rm-status">🔒</div>
+      </div>
+      <div class="rm-tier locked">
+        <div class="rm-icon">💎</div>
+        <div class="rm-name" style="color:var(--diamond)">Diamond</div>
+        <div class="rm-rate">$10/lot</div>
+        <div class="rm-range">Up to 1,500 users</div>
+        <div class="rm-status">🔒</div>
+      </div>
+      <div class="rm-tier locked">
+        <div class="rm-icon">👑</div>
+        <div class="rm-name" style="color:var(--plat)">Platinum</div>
+        <div class="rm-rate">$12/lot</div>
+        <div class="rm-range">1,500+ users</div>
+        <div class="rm-status">🔒</div>
+      </div>
+    </div>
+
+    <!-- Referred Users Table -->
+    <div class="section-header">
+      <div class="section-title display">Your Referred Users</div>
+      <div class="tab-group">
+        <button class="tab active" onclick="setTab(this)">All</button>
+        <button class="tab" onclick="setTab(this)">Active</button>
+        <button class="tab" onclick="setTab(this)">Inactive</button>
+      </div>
+    </div>
+    <div class="table-card">
+      <div class="tbl-header">
+        <div>User</div><div>Status</div><div>Lots</div><div>Your Earn</div><div>Joined</div>
+      </div>
+      <div class="tbl-row">
+        <div class="user-cell">
+          <div class="user-avatar" style="background:linear-gradient(135deg,var(--green),#00b4d8)">01</div>
+          <div><div class="user-name">User #MS-J-0001</div><div class="user-sub">Forex · Gold</div></div>
+        </div>
+        <div><span class="badge badge-active">Active</span></div>
+        <div style="font-weight:600">342</div>
+        <div style="color:var(--green);font-weight:700" class="mono">$2,736</div>
+        <div style="color:var(--text3);font-size:12px">Mar 2</div>
+      </div>
+      <div class="tbl-row">
+        <div class="user-cell">
+          <div class="user-avatar" style="background:linear-gradient(135deg,var(--gold),#ff8844)">02</div>
+          <div><div class="user-name">User #MS-J-0002</div><div class="user-sub">Indices · Forex</div></div>
+        </div>
+        <div><span class="badge badge-active">Active</span></div>
+        <div style="font-weight:600">518</div>
+        <div style="color:var(--green);font-weight:700" class="mono">$4,144</div>
+        <div style="color:var(--text3);font-size:12px">Mar 8</div>
+      </div>
+      <div class="tbl-row">
+        <div class="user-cell">
+          <div class="user-avatar" style="background:linear-gradient(135deg,var(--purple),#6366f1)">03</div>
+          <div><div class="user-name">User #MS-J-0003</div><div class="user-sub">Gold</div></div>
+        </div>
+        <div><span class="badge badge-new">New</span></div>
+        <div style="font-weight:600">27</div>
+        <div style="color:var(--green);font-weight:700" class="mono">$216</div>
+        <div style="color:var(--text3);font-size:12px">Apr 9</div>
+      </div>
+      <div class="tbl-row">
+        <div class="user-cell">
+          <div class="user-avatar" style="background:linear-gradient(135deg,var(--red),#ff8888)">04</div>
+          <div><div class="user-name">User #MS-J-0004</div><div class="user-sub">Crypto · Forex</div></div>
+        </div>
+        <div><span class="badge badge-inactive">Inactive</span></div>
+        <div style="font-weight:600">84</div>
+        <div style="color:var(--green);font-weight:700" class="mono">$672</div>
+        <div style="color:var(--text3);font-size:12px">Feb 19</div>
+      </div>
+      <div class="tbl-row">
+        <div class="user-cell">
+          <div class="user-avatar" style="background:linear-gradient(135deg,var(--blue),#3b82f6)">05</div>
+          <div><div class="user-name">User #MS-J-0005</div><div class="user-sub">Forex</div></div>
+        </div>
+        <div><span class="badge badge-active">Active</span></div>
+        <div style="font-weight:600">203</div>
+        <div style="color:var(--green);font-weight:700" class="mono">$1,624</div>
+        <div style="color:var(--text3);font-size:12px">Mar 15</div>
+      </div>
+    </div>
+
+    <!-- Bottom grid: Payouts + How it works -->
+    <div class="bottom-grid">
+      <!-- Payouts -->
+      <div>
+        <div class="section-header"><div class="section-title display">Payout History</div></div>
+        <div class="table-card">
+          <div class="payout-row">
+            <div class="payout-left">
+              <div class="payout-icon" style="background:var(--green-dim)">💰</div>
+              <div>
+                <div class="payout-label">March 2026</div>
+                <div class="payout-date">Processed Apr 5 · 3,640 lots</div>
+              </div>
+            </div>
+            <div class="payout-right">
+              <div class="payout-amt mono" style="color:var(--green)">$29,120</div>
+              <span class="payout-status" style="background:var(--green-dim);color:var(--green)">Paid</span>
+            </div>
+          </div>
+          <div class="payout-row">
+            <div class="payout-left">
+              <div class="payout-icon" style="background:var(--green-dim)">💰</div>
+              <div>
+                <div class="payout-label">February 2026</div>
+                <div class="payout-date">Processed Mar 5 · 2,980 lots</div>
+              </div>
+            </div>
+            <div class="payout-right">
+              <div class="payout-amt mono" style="color:var(--green)">$23,840</div>
+              <span class="payout-status" style="background:var(--green-dim);color:var(--green)">Paid</span>
+            </div>
+          </div>
+          <div class="payout-row">
+            <div class="payout-left">
+              <div class="payout-icon" style="background:var(--gold-dim)">⏳</div>
+              <div>
+                <div class="payout-label">April 2026 (In Progress)</div>
+                <div class="payout-date">Settlement May 5 · 1,812 lots so far</div>
+              </div>
+            </div>
+            <div class="payout-right">
+              <div class="payout-amt mono" style="color:var(--gold)">$14,496</div>
+              <span class="payout-status" style="background:var(--gold-dim);color:var(--gold)">Pending</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- How Tracking Works -->
+      <div>
+        <div class="section-header"><div class="section-title display">How Tracking Works</div></div>
+        <div class="how-card">
+          <div class="how-steps">
+            <div class="how-step">
+              <div class="how-num">01</div>
+              <div class="how-step-title">Share Your Code</div>
+              <div class="how-step-desc">Your audience enters <b style="color:var(--green)">MS-JOHN</b> at signup. Permanently tagged to you.</div>
+            </div>
+            <div class="how-step">
+              <div class="how-num">02</div>
+              <div class="how-step-title">Users Auto-Counted</div>
+              <div class="how-step-desc">Every sign-up with your code adds to your user count and moves you up tiers.</div>
+            </div>
+            <div class="how-step">
+              <div class="how-num">03</div>
+              <div class="how-step-title">Lots Tracked Live</div>
+              <div class="how-step-desc">Every lot your users trade is counted in real-time at your current tier rate.</div>
+            </div>
+            <div class="how-step">
+              <div class="how-num">04</div>
+              <div class="how-step-title">Monthly Payout</div>
+              <div class="how-step-desc">Settled on the 5th. Bank or crypto. Zero fees. Full transparency.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+function copyCode() {
+  navigator.clipboard.writeText('https://marketscore.app/join/MS-JOHN').then(() => {
+    const b = document.querySelector('.btn-primary');
+    b.textContent = '✓ Copied!';
+    setTimeout(() => b.textContent = '📋 Copy Link', 2000);
+  });
+}
+
+function setTab(el) {
+  el.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// Animate tier bar on load
+document.addEventListener('DOMContentLoaded', () => {
+  const fill = document.querySelector('.tier-bar-fill');
+  if (fill) {
+    fill.style.width = '0%';
+    setTimeout(() => { fill.style.width = '69%'; }, 200);
+  }
+});
+</script>
+</body>
+</html>
