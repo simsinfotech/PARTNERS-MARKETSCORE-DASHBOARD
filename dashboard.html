@@ -86,9 +86,8 @@ body::before {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.5);
     z-index: 150;
-    backdrop-filter: blur(4px);
   }
   .sidebar-overlay.open { display: block; }
 }
@@ -838,11 +837,428 @@ body::before {
 .anim-in:nth-child(2) { animation-delay: 0.05s; }
 .anim-in:nth-child(3) { animation-delay: 0.1s; }
 .anim-in:nth-child(4) { animation-delay: 0.15s; }
+
+/* ─── Login Screen ─── */
+.login-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  transition: opacity 0.5s, visibility 0.5s;
+}
+
+.login-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.login-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('Broker Page BG (1).png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.login-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 7, 13, 0.4);
+}
+
+.login-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 20px;
+  background: rgba(11, 17, 32, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 20px 32px 32px;
+  animation: loginFadeIn 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+
+@keyframes loginFadeIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.login-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0;
+}
+
+.login-logo img {
+  height: 200px;
+  object-fit: contain;
+  margin: -20px 0 -20px;
+}
+
+.login-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: -0.5px;
+  margin-bottom: 2px;
+  color: var(--text);
+}
+
+.login-subtitle {
+  font-size: 13px;
+  color: var(--text3);
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.login-field {
+  margin-bottom: 12px;
+}
+
+.login-label {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 8px;
+}
+
+.login-input {
+  width: 100%;
+  padding: 13px 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.login-input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(0,229,160,0.1);
+}
+
+.login-input::placeholder {
+  color: var(--text3);
+}
+
+.login-remember {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: var(--text3);
+}
+
+.login-remember label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.login-remember input[type="checkbox"] {
+  accent-color: var(--green);
+  width: 14px;
+  height: 14px;
+}
+
+.login-remember a {
+  color: var(--green);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-remember a:hover {
+  text-decoration: underline;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--green);
+  color: var(--bg);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 30px rgba(0,229,160,0.3);
+}
+
+.login-btn:active {
+  transform: translateY(0);
+}
+
+.login-error {
+  color: var(--red);
+  font-size: 12px;
+  text-align: center;
+  margin-top: 12px;
+  min-height: 18px;
+  transition: opacity 0.3s;
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--text3);
+}
+
+.login-footer a {
+  color: var(--green);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-footer a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 32px 20px;
+    margin: 0 12px;
+    border-radius: 16px;
+  }
+  .login-title { font-size: 20px; }
+}
+
+/* ─── My Users Page ─── */
+.mu-filters {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+
+.mu-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.mu-input, .mu-select {
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+  min-width: 120px;
+}
+
+.mu-input:focus, .mu-select:focus {
+  border-color: var(--green);
+}
+
+.mu-select { cursor: pointer; }
+.mu-select option { background: var(--bg2); color: var(--text); }
+
+.mu-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--text3);
+}
+
+.mu-table-wrap {
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+}
+
+.mu-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+  font-size: 13px;
+}
+
+.mu-table thead tr {
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--border);
+}
+
+.mu-table th {
+  padding: 12px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text3);
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.mu-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  color: var(--text2);
+}
+
+.mu-table tbody tr:last-child td { border-bottom: none; }
+.mu-table tbody tr { transition: background 0.2s; }
+.mu-table tbody tr:hover { background: rgba(255,255,255,0.015); }
+
+.mu-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.mu-page-btns { display: flex; gap: 6px; }
+
+.mu-page-btn {
+  padding: 6px 12px;
+  border-radius: var(--radius-xs);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text3);
+  transition: all 0.2s;
+}
+
+.mu-page-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+}
+
+.mu-page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.mu-page-btn.mu-page-active {
+  background: var(--green);
+  color: var(--bg);
+  border-color: var(--green);
+}
+
+@media (max-width: 600px) {
+  .mu-input, .mu-select { min-width: 100%; }
+}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 
-<div class="layout">
+<!-- ─── Login Screen ─── -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-bg"></div>
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="Design Files/Design 1/Design_1.png" alt="MarketScore" />
+    </div>
+    <div class="login-title" id="authTitle">Partner Dashboard</div>
+    <div class="login-subtitle" id="authSubtitle">Sign in to access your partner account</div>
+
+    <!-- Sign In Form -->
+    <form onsubmit="handleLogin(event)" id="loginForm">
+      <div class="login-field">
+        <label class="login-label">Email</label>
+        <input class="login-input" type="email" id="loginEmail" placeholder="you@example.com" autocomplete="username" required />
+      </div>
+      <div class="login-field">
+        <label class="login-label">Password</label>
+        <input class="login-input" type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password" required />
+      </div>
+      <div class="login-remember">
+        <label><input type="checkbox" checked /> Remember me</label>
+        <a href="#" onclick="showForgotPassword(event)">Forgot password?</a>
+      </div>
+      <button class="login-btn" type="submit">Sign In</button>
+      <div class="login-error" id="loginError"></div>
+    </form>
+
+    <!-- Sign Up Form -->
+    <form onsubmit="handleSignUp(event)" id="signupForm" style="display:none">
+      <div class="login-field">
+        <label class="login-label">Full Name</label>
+        <input class="login-input" type="text" id="signupName" placeholder="John Doe" autocomplete="name" required />
+      </div>
+      <div class="login-field">
+        <label class="login-label">Email</label>
+        <input class="login-input" type="email" id="signupEmail" placeholder="you@example.com" autocomplete="email" required />
+      </div>
+      <div class="login-field">
+        <label class="login-label">Password</label>
+        <input class="login-input" type="password" id="signupPassword" placeholder="Min 6 characters" autocomplete="new-password" required minlength="6" />
+      </div>
+      <button class="login-btn" type="submit">Create Account</button>
+      <div class="login-error" id="signupError"></div>
+    </form>
+
+    <!-- Forgot Password Form -->
+    <form onsubmit="handleForgotPassword(event)" id="forgotForm" style="display:none">
+      <div class="login-field">
+        <label class="login-label">Email</label>
+        <input class="login-input" type="email" id="forgotEmail" placeholder="you@example.com" autocomplete="email" required />
+      </div>
+      <button class="login-btn" type="submit">Send Reset Link</button>
+      <div class="login-error" id="forgotError"></div>
+      <div id="forgotSuccess" style="color:var(--green);font-size:12px;text-align:center;margin-top:12px;min-height:18px"></div>
+    </form>
+
+    <!-- Reset Password Form (shown after clicking reset link) -->
+    <form onsubmit="handleResetPassword(event)" id="resetForm" style="display:none">
+      <div class="login-field">
+        <label class="login-label">New Password</label>
+        <input class="login-input" type="password" id="resetPassword" placeholder="Min 6 characters" autocomplete="new-password" required minlength="6" />
+      </div>
+      <div class="login-field">
+        <label class="login-label">Confirm Password</label>
+        <input class="login-input" type="password" id="resetPasswordConfirm" placeholder="Confirm new password" autocomplete="new-password" required minlength="6" />
+      </div>
+      <button class="login-btn" type="submit">Update Password</button>
+      <div class="login-error" id="resetError"></div>
+    </form>
+
+    <div class="login-footer" id="authFooter">
+      Don't have an account? <a href="#" onclick="showSignUp(event)">Sign up</a>
+    </div>
+  </div>
+</div>
+
+<div class="layout" id="dashboardLayout" style="display:none">
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sb-logo">
@@ -850,22 +1266,22 @@ body::before {
     </div>
 
     <nav class="sb-nav">
-      <div class="sb-item active">
+      <div class="sb-item active" onclick="switchPage('dashboard')">
         <span class="icon">📊</span> Dashboard
       </div>
-      <div class="sb-item">
+      <div class="sb-item" onclick="switchPage('myusers')">
         <span class="icon">👥</span> My Users
       </div>
-      <div class="sb-item">
+      <div class="sb-item" onclick="switchPage('payouts')">
         <span class="icon">💰</span> Payouts
       </div>
-      <div class="sb-item">
+      <div class="sb-item" onclick="switchPage('analytics')">
         <span class="icon">📈</span> Analytics
       </div>
-      <div class="sb-item">
+      <div class="sb-item" onclick="switchPage('contentkit')">
         <span class="icon">🎨</span> Content Kit
       </div>
-      <div class="sb-item">
+      <div class="sb-item" onclick="switchPage('settings')">
         <span class="icon">⚙️</span> Settings
       </div>
     </nav>
@@ -874,6 +1290,9 @@ body::before {
       <div class="sb-user-name">John Crypto</div>
       <div class="sb-user-email">john@example.com</div>
       <div class="sb-user-tier">🥈 Silver Partner</div>
+      <button onclick="handleLogout()" style="margin-top:10px;width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--radius-xs);background:rgba(255,77,106,0.06);color:var(--red);font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s">
+        Sign Out
+      </button>
     </div>
   </aside>
 
@@ -895,6 +1314,8 @@ body::before {
 
   <!-- Main Content -->
   <main class="main">
+    <!-- ═══ DASHBOARD PAGE ═══ -->
+    <div id="page-dashboard">
     <!-- Header -->
     <div class="header">
       <div>
@@ -1184,10 +1605,344 @@ body::before {
         </div>
       </div>
     </div>
+    </div><!-- /page-dashboard -->
+
+    <!-- ═══ MY USERS PAGE ═══ -->
+    <div id="page-myusers" style="display:none">
+      <div class="header">
+        <div>
+          <h1 class="display">Client List Report</h1>
+          <p style="font-size:13px;color:var(--text3);margin-top:4px">Manage and view all your referred client accounts</p>
+        </div>
+        <div class="header-right">
+          <div style="font-size:12px;color:var(--text3)">Data Last Update: <span class="mono" style="color:var(--text2)">2026-04-13 09:30:00</span></div>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="mu-filters">
+        <div class="mu-filter-row">
+          <input type="text" class="mu-input" placeholder="User ID" />
+          <input type="text" class="mu-input" placeholder="Username" />
+          <input type="text" class="mu-input" placeholder="Email" />
+          <select class="mu-select">
+            <option value="">Role</option>
+            <option>Client</option>
+            <option>IB Agent</option>
+          </select>
+          <select class="mu-select">
+            <option value="">Country</option>
+            <option>India</option>
+            <option>Pakistan</option>
+            <option>UAE</option>
+          </select>
+          <select class="mu-select">
+            <option value="">KYC Status</option>
+            <option>Verified</option>
+            <option>Pending</option>
+            <option>Rejected</option>
+          </select>
+          <input type="date" class="mu-input" style="width:140px" />
+          <input type="date" class="mu-input" style="width:140px" />
+          <button class="btn btn-primary" style="padding:8px 20px">Search</button>
+          <button class="btn btn-secondary" style="padding:8px 16px">Reset</button>
+        </div>
+      </div>
+
+      <!-- Summary Row -->
+      <div class="mu-summary">
+        <span>Total User Account Record: <b style="color:var(--text)">6</b></span>
+        <button class="btn btn-secondary" style="padding:6px 16px;font-size:12px">📥 Export</button>
+      </div>
+
+      <!-- Data Table -->
+      <div class="mu-table-wrap">
+        <table class="mu-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>User ID</th>
+              <th>Username</th>
+              <th>Country</th>
+              <th>Role</th>
+              <th>Phone Number</th>
+              <th>Email</th>
+              <th>Superior Agent</th>
+              <th>Total Balance</th>
+              <th>Total Deposit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td class="mono">30094</td>
+              <td>ZEESHAN A</td>
+              <td>Pakistan</td>
+              <td><span class="badge badge-active">Client</span></td>
+              <td class="mono">+92 312 *****78</td>
+              <td>zee***@gmail.com</td>
+              <td>MS-JOHN</td>
+              <td class="mono" style="color:var(--green)">$4,250.00</td>
+              <td class="mono" style="color:var(--gold)">$12,500.00</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td class="mono">30095</td>
+              <td>KHOULA FA</td>
+              <td>UAE</td>
+              <td><span class="badge badge-active">Client</span></td>
+              <td class="mono">+971 50 *****23</td>
+              <td>kho***@gmail.com</td>
+              <td>MS-JOHN</td>
+              <td class="mono" style="color:var(--green)">$8,120.50</td>
+              <td class="mono" style="color:var(--gold)">$25,000.00</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td class="mono">30096</td>
+              <td>Shridhar S T</td>
+              <td>India</td>
+              <td><span class="badge badge-new">IB Agent</span></td>
+              <td class="mono">+91 98 *****45</td>
+              <td>shr***@yahoo.com</td>
+              <td>MS-JOHN</td>
+              <td class="mono" style="color:var(--green)">$15,340.00</td>
+              <td class="mono" style="color:var(--gold)">$42,000.00</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td class="mono">30097</td>
+              <td>Salma Ansari</td>
+              <td>India</td>
+              <td><span class="badge badge-active">Client</span></td>
+              <td class="mono">+91 88 *****12</td>
+              <td>sal***@gmail.com</td>
+              <td>MS-JOHN</td>
+              <td class="mono" style="color:var(--green)">$2,890.75</td>
+              <td class="mono" style="color:var(--gold)">$8,500.00</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td class="mono">30098</td>
+              <td>SHRIDHAR</td>
+              <td>India</td>
+              <td><span class="badge badge-active">Client</span></td>
+              <td class="mono">+91 77 *****89</td>
+              <td>shr***@outlook.com</td>
+              <td>MS-JOHN</td>
+              <td class="mono" style="color:var(--green)">$6,475.25</td>
+              <td class="mono" style="color:var(--gold)">$18,200.00</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td class="mono">30099</td>
+              <td>Mahesh Ku</td>
+              <td>India</td>
+              <td><span class="badge badge-active">Client</span></td>
+              <td class="mono">+91 99 *****34</td>
+              <td>mah***@gmail.com</td>
+              <td>MS-JOHN</td>
+              <td class="mono" style="color:var(--green)">$1,120.00</td>
+              <td class="mono" style="color:var(--gold)">$3,750.00</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="mu-pagination">
+        <span style="font-size:13px;color:var(--text3)">Showing 1-6 of 6 records</span>
+        <div class="mu-page-btns">
+          <button class="mu-page-btn" disabled>‹ Prev</button>
+          <button class="mu-page-btn mu-page-active">1</button>
+          <button class="mu-page-btn" disabled>Next ›</button>
+        </div>
+      </div>
+    </div><!-- /page-myusers -->
+
   </main>
 </div>
 
 <script>
+// Supabase client
+const SUPABASE_URL = 'https://rhsjbsyyxpnrvespyedp.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJoc2pic3l5eHBucnZlc3B5ZWRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzQ2MjUsImV4cCI6MjA5MTY1MDYyNX0.e0HGi5sum9KQp474FmpracBBBNg8nT5eX2gTMZzPzmk';
+const { createClient } = window.supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// --- UI helpers ---
+function showDashboard() {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('dashboardLayout').style.display = 'grid';
+}
+
+function showLoginScreen() {
+  document.getElementById('dashboardLayout').style.display = 'none';
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+  switchAuthView('login');
+}
+
+function switchAuthView(view) {
+  const views = { login: 'loginForm', signup: 'signupForm', forgot: 'forgotForm', reset: 'resetForm' };
+  Object.values(views).forEach(id => document.getElementById(id).style.display = 'none');
+  document.getElementById(views[view]).style.display = 'block';
+
+  const title = document.getElementById('authTitle');
+  const subtitle = document.getElementById('authSubtitle');
+  const footer = document.getElementById('authFooter');
+
+  if (view === 'login') {
+    title.textContent = 'Partner Dashboard';
+    subtitle.textContent = 'Sign in to access your partner account';
+    footer.innerHTML = 'Don\'t have an account? <a href="#" onclick="showSignUp(event)">Sign up</a>';
+  } else if (view === 'signup') {
+    title.textContent = 'Create Account';
+    subtitle.textContent = 'Sign up to become a partner';
+    footer.innerHTML = 'Already have an account? <a href="#" onclick="showSignIn(event)">Sign in</a>';
+  } else if (view === 'forgot') {
+    title.textContent = 'Reset Password';
+    subtitle.textContent = 'Enter your email to receive a reset link';
+    footer.innerHTML = 'Remember your password? <a href="#" onclick="showSignIn(event)">Sign in</a>';
+  } else if (view === 'reset') {
+    title.textContent = 'Set New Password';
+    subtitle.textContent = 'Choose a new password for your account';
+    footer.innerHTML = '';
+  }
+}
+
+function showSignUp(e) { e.preventDefault(); switchAuthView('signup'); }
+function showSignIn(e) { e.preventDefault(); switchAuthView('login'); }
+function showForgotPassword(e) { e.preventDefault(); switchAuthView('forgot'); }
+
+// --- Auth handlers ---
+async function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errorEl = document.getElementById('loginError');
+  const btn = e.target.querySelector('.login-btn');
+
+  if (!email || !password) { errorEl.textContent = 'Please fill in all fields.'; return; }
+
+  btn.textContent = 'Signing in...';
+  btn.disabled = true;
+
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+
+  btn.textContent = 'Sign In';
+  btn.disabled = false;
+
+  if (error) {
+    errorEl.textContent = error.message;
+    document.getElementById('loginPassword').value = '';
+    return;
+  }
+  errorEl.textContent = '';
+  showDashboard();
+}
+
+async function handleSignUp(e) {
+  e.preventDefault();
+  const name = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  const errorEl = document.getElementById('signupError');
+  const btn = e.target.querySelector('.login-btn');
+
+  if (!name || !email || !password) { errorEl.textContent = 'Please fill in all fields.'; return; }
+
+  btn.textContent = 'Creating account...';
+  btn.disabled = true;
+
+  const { error } = await sb.auth.signUp({
+    email,
+    password,
+    options: { data: { name } }
+  });
+
+  btn.textContent = 'Create Account';
+  btn.disabled = false;
+
+  if (error) { errorEl.textContent = error.message; return; }
+
+  errorEl.style.color = 'var(--green)';
+  errorEl.textContent = 'Account created! Check your email to confirm, then sign in.';
+}
+
+async function handleForgotPassword(e) {
+  e.preventDefault();
+  const email = document.getElementById('forgotEmail').value.trim();
+  const errorEl = document.getElementById('forgotError');
+  const successEl = document.getElementById('forgotSuccess');
+  const btn = e.target.querySelector('.login-btn');
+
+  if (!email) { errorEl.textContent = 'Please enter your email.'; return; }
+
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+  errorEl.textContent = '';
+  successEl.textContent = '';
+
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname
+  });
+
+  btn.textContent = 'Send Reset Link';
+  btn.disabled = false;
+
+  if (error) { errorEl.textContent = error.message; return; }
+  successEl.textContent = 'Reset link sent! Check your inbox.';
+}
+
+async function handleResetPassword(e) {
+  e.preventDefault();
+  const password = document.getElementById('resetPassword').value;
+  const confirm = document.getElementById('resetPasswordConfirm').value;
+  const errorEl = document.getElementById('resetError');
+  const btn = e.target.querySelector('.login-btn');
+
+  if (password !== confirm) { errorEl.textContent = 'Passwords do not match.'; return; }
+
+  btn.textContent = 'Updating...';
+  btn.disabled = true;
+
+  const { error } = await sb.auth.updateUser({ password });
+
+  btn.textContent = 'Update Password';
+  btn.disabled = false;
+
+  if (error) { errorEl.textContent = error.message; return; }
+  showDashboard();
+}
+
+// Logout handler
+async function handleLogout() {
+  await sb.auth.signOut();
+  showLoginScreen();
+}
+
+// --- Session check on page load ---
+(async function checkSession() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    showDashboard();
+  }
+})();
+
+// Listen for auth state changes (including password recovery redirect)
+sb.auth.onAuthStateChange((event, session) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    // User arrived via reset link — show the new password form
+    document.getElementById('loginScreen').classList.remove('hidden');
+    document.getElementById('dashboardLayout').style.display = 'none';
+    switchAuthView('reset');
+  } else if (event === 'SIGNED_OUT' || !session) {
+    showLoginScreen();
+  }
+});
+
 function toggleSidebar() {
   document.querySelector('.sidebar').classList.toggle('open');
   document.getElementById('sidebarOverlay').classList.toggle('open');
@@ -1199,6 +1954,23 @@ function copyCode() {
     b.textContent = '✓ Copied!';
     setTimeout(() => b.textContent = '📋 Copy Link', 2000);
   });
+}
+
+function switchPage(page) {
+  // Hide all page sections
+  document.querySelectorAll('[id^="page-"]').forEach(el => el.style.display = 'none');
+  // Show selected page
+  const target = document.getElementById('page-' + page);
+  if (target) target.style.display = 'block';
+  // Update active sidebar item
+  const items = document.querySelectorAll('.sb-item');
+  const pageMap = ['dashboard', 'myusers', 'payouts', 'analytics', 'contentkit', 'settings'];
+  items.forEach((item, i) => {
+    item.classList.toggle('active', pageMap[i] === page);
+  });
+  // Close mobile sidebar
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
 }
 
 function setTab(el) {
