@@ -6,6 +6,7 @@
 <title>MarketScore — Partner Dashboard</title>
 <link rel="icon" type="image/png" href="App Icon.png" />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css" rel="stylesheet">
 <style>
 :root {
   --bg: #05080F;
@@ -1643,29 +1644,29 @@ body::before {
 
     <nav class="sb-nav">
       <div class="sb-item active" onclick="switchPage('dashboard')">
-        <span class="icon">📊</span> Dashboard
+        <span class="icon"><i class="ri-dashboard-line"></i></span> Dashboard
       </div>
       <div class="sb-item" onclick="switchPage('myusers')">
-        <span class="icon">👥</span> My Users
+        <span class="icon"><i class="ri-group-line"></i></span> My Users
       </div>
       <div class="sb-item" onclick="switchPage('payouts')">
-        <span class="icon">💰</span> Payouts
+        <span class="icon"><i class="ri-wallet-3-line"></i></span> Payouts
       </div>
       <div class="sb-item" onclick="switchPage('analytics')">
-        <span class="icon">📈</span> Analytics
+        <span class="icon"><i class="ri-line-chart-line"></i></span> Analytics
       </div>
       <div class="sb-item" onclick="switchPage('contentkit')">
-        <span class="icon">🎨</span> Content Kit
+        <span class="icon"><i class="ri-palette-line"></i></span> Content Kit
       </div>
       <div class="sb-item" onclick="switchPage('settings')">
-        <span class="icon">⚙️</span> Settings
+        <span class="icon"><i class="ri-settings-3-line"></i></span> Settings
       </div>
     </nav>
 
     <div class="sb-user">
       <div class="sb-user-name">John Crypto</div>
       <div class="sb-user-email">john@example.com</div>
-      <div class="sb-user-tier">🥈 Silver Partner</div>
+      <div class="sb-user-tier"><i class="ri-medal-line"></i> Silver Partner</div>
       <button onclick="handleLogout()" style="margin-top:10px;width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--radius-xs);background:rgba(255,77,106,0.06);color:var(--red);font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s">
         Sign Out
       </button>
@@ -1713,7 +1714,7 @@ body::before {
         <div class="ref-link">marketscore.app/join/<b>MS-JOHN</b></div>
       </div>
       <div class="ref-btns">
-        <button class="btn btn-primary" onclick="copyCode()">📋 Copy Link</button>
+        <button class="btn btn-primary" onclick="copyCode()"><i class="ri-file-copy-line"></i> Copy Link</button>
         <button class="btn btn-secondary">QR Code</button>
       </div>
     </div>
@@ -1721,7 +1722,7 @@ body::before {
     <!-- Tier Status -->
     <div class="tier-card anim-in">
       <div>
-        <div class="tier-badge" style="background:rgba(192,192,192,0.08);color:var(--silver)">🥈 SILVER · $8/lot</div>
+        <div class="tier-badge" style="background:rgba(192,192,192,0.08);color:var(--silver)"><i class="ri-medal-line"></i> SILVER · $8/lot</div>
         <div class="tier-info">You have <b>347 users</b>. Reach <b>500</b> to unlock <span style="color:var(--gold)">Gold</span> at <b>$9/lot</b>.</div>
       </div>
       <div class="tier-progress">
@@ -1803,39 +1804,39 @@ body::before {
     <div class="roadmap anim-in">
       <div class="roadmap-title display">Your Tier Roadmap</div>
       <div class="rm-tier done">
-        <div class="rm-icon">🥉</div>
+        <div class="rm-icon"><i class="ri-bronze-medal-line" style="color:var(--bronze)"></i></div>
         <div class="rm-name" style="color:var(--bronze)">Bronze</div>
         <div class="rm-rate">$7/lot</div>
         <div class="rm-range">Up to 200 users</div>
-        <div class="rm-status">✅</div>
+        <div class="rm-status"><i class="ri-check-line" style="color:var(--green)"></i></div>
       </div>
       <div class="rm-tier current">
-        <div class="rm-icon">🥈</div>
+        <div class="rm-icon"><i class="ri-medal-line" style="color:var(--silver)"></i></div>
         <div class="rm-name" style="color:var(--silver)">Silver</div>
         <div class="rm-rate">$8/lot</div>
         <div class="rm-range">Up to 500 users · <b style="color:var(--text)">347 / 500</b></div>
-        <div class="rm-status">⬅️</div>
+        <div class="rm-status"><i class="ri-arrow-left-s-line" style="color:var(--green)"></i></div>
       </div>
       <div class="rm-tier locked">
-        <div class="rm-icon">🥇</div>
+        <div class="rm-icon"><i class="ri-medal-2-line" style="color:var(--gold)"></i></div>
         <div class="rm-name" style="color:var(--gold)">Gold</div>
         <div class="rm-rate">$9/lot</div>
         <div class="rm-range">Up to 1,000 users</div>
-        <div class="rm-status">🔒</div>
+        <div class="rm-status"><i class="ri-lock-line" style="color:var(--text3)"></i></div>
       </div>
       <div class="rm-tier locked">
-        <div class="rm-icon">💎</div>
+        <div class="rm-icon"><i class="ri-diamond-line" style="color:var(--diamond)"></i></div>
         <div class="rm-name" style="color:var(--diamond)">Diamond</div>
         <div class="rm-rate">$10/lot</div>
         <div class="rm-range">Up to 1,500 users</div>
-        <div class="rm-status">🔒</div>
+        <div class="rm-status"><i class="ri-lock-line" style="color:var(--text3)"></i></div>
       </div>
       <div class="rm-tier locked">
-        <div class="rm-icon">👑</div>
+        <div class="rm-icon"><i class="ri-vip-crown-line" style="color:var(--plat)"></i></div>
         <div class="rm-name" style="color:var(--plat)">Platinum</div>
         <div class="rm-rate">$12/lot</div>
         <div class="rm-range">1,500+ users</div>
-        <div class="rm-status">🔒</div>
+        <div class="rm-status"><i class="ri-lock-line" style="color:var(--text3)"></i></div>
       </div>
     </div>
 
@@ -1912,7 +1913,7 @@ body::before {
         <div class="table-card">
           <div class="payout-row">
             <div class="payout-left">
-              <div class="payout-icon" style="background:var(--green-dim)">💰</div>
+              <div class="payout-icon" style="background:var(--green-dim);color:var(--green)"><i class="ri-money-dollar-circle-line"></i></div>
               <div>
                 <div class="payout-label">March 2026</div>
                 <div class="payout-date">Processed Apr 5 · 3,640 lots</div>
@@ -1925,7 +1926,7 @@ body::before {
           </div>
           <div class="payout-row">
             <div class="payout-left">
-              <div class="payout-icon" style="background:var(--green-dim)">💰</div>
+              <div class="payout-icon" style="background:var(--green-dim);color:var(--green)"><i class="ri-money-dollar-circle-line"></i></div>
               <div>
                 <div class="payout-label">February 2026</div>
                 <div class="payout-date">Processed Mar 5 · 2,980 lots</div>
@@ -1938,7 +1939,7 @@ body::before {
           </div>
           <div class="payout-row">
             <div class="payout-left">
-              <div class="payout-icon" style="background:var(--gold-dim)">⏳</div>
+              <div class="payout-icon" style="background:var(--gold-dim);color:var(--gold)"><i class="ri-time-line"></i></div>
               <div>
                 <div class="payout-label">April 2026 (In Progress)</div>
                 <div class="payout-date">Settlement May 5 · 1,812 lots so far</div>
@@ -2028,7 +2029,7 @@ body::before {
       <!-- Summary Row -->
       <div class="mu-summary">
         <span>Total User Account Record: <b style="color:var(--text)" id="myUsersTotalCount">0</b></span>
-        <button class="btn btn-secondary" style="padding:6px 16px;font-size:12px">📥 Export</button>
+        <button class="btn btn-secondary" style="padding:6px 16px;font-size:12px"><i class="ri-download-2-line"></i> Export</button>
       </div>
 
       <!-- Data Table -->
@@ -2051,7 +2052,7 @@ body::before {
           <tbody id="myUsersTableBody">
             <tr>
               <td colspan="10" style="text-align:center;padding:48px 16px;color:var(--text3)">
-                <div style="font-size:32px;margin-bottom:12px">📭</div>
+                <div style="font-size:32px;margin-bottom:12px"><i class="ri-inbox-line"></i></div>
                 <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:4px">No user data available</div>
                 <div style="font-size:12px">User records will appear here once connected to a data source</div>
               </td>
@@ -2133,9 +2134,9 @@ body::before {
               <input type="hidden" id="withdrawMethod" value="bank" />
               <div class="wm-selector">
                 <div class="wm-selected" onclick="toggleMethodDropdown()">
-                  <span class="wm-selected-icon" id="wmSelectedIcon">🏦</span>
+                  <span class="wm-selected-icon" id="wmSelectedIcon"><i class="ri-bank-line"></i></span>
                   <span id="wmSelectedLabel">India Bank Transfer</span>
-                  <span class="wm-arrow" id="wmArrow">▾</span>
+                  <span class="wm-arrow" id="wmArrow"><i class="ri-arrow-down-s-line"></i></span>
                 </div>
                 <div class="wm-dropdown" id="wmDropdown" style="display:none">
                   <div class="wm-dropdown-title">Select Withdrawal Method</div>
@@ -2146,20 +2147,20 @@ body::before {
                     <button class="wm-tab" onclick="filterMethods('offline', this)">Offline Transfer</button>
                   </div>
                   <div class="wm-options" id="wmOptions">
-                    <div class="wm-option active" data-value="bank" data-cat="bank" onclick="selectMethod(this, 'bank', '🏦', 'India Bank Transfer')">
-                      <span class="wm-opt-icon" style="background:var(--blue-dim);color:var(--blue)">🏦</span>
+                    <div class="wm-option active" data-value="bank" data-cat="bank" onclick="selectMethod(this, 'bank', 'ri-bank-line', 'India Bank Transfer')">
+                      <span class="wm-opt-icon" style="background:var(--blue-dim);color:var(--blue)"><i class="ri-bank-line"></i></span>
                       <span>India Bank Transfer</span>
                     </div>
-                    <div class="wm-option" data-value="eth" data-cat="crypto" onclick="selectMethod(this, 'crypto', '⟠', 'ETH')">
-                      <span class="wm-opt-icon" style="background:var(--purple-dim);color:var(--purple)">⟠</span>
+                    <div class="wm-option" data-value="eth" data-cat="crypto" onclick="selectMethod(this, 'crypto', 'ri-eth-line', 'ETH')">
+                      <span class="wm-opt-icon" style="background:var(--purple-dim);color:var(--purple)"><i class="ri-eth-line"></i></span>
                       <span>ETH</span>
                     </div>
-                    <div class="wm-option" data-value="btc" data-cat="crypto" onclick="selectMethod(this, 'crypto', '₿', 'BTC')">
-                      <span class="wm-opt-icon" style="background:var(--gold-dim);color:var(--gold)">₿</span>
+                    <div class="wm-option" data-value="btc" data-cat="crypto" onclick="selectMethod(this, 'crypto', 'ri-bit-coin-line', 'BTC')">
+                      <span class="wm-opt-icon" style="background:var(--gold-dim);color:var(--gold)"><i class="ri-bit-coin-line"></i></span>
                       <span>BTC</span>
                     </div>
-                    <div class="wm-option" data-value="usdt" data-cat="crypto" onclick="selectMethod(this, 'crypto', '₮', 'USDT-TRC20')">
-                      <span class="wm-opt-icon" style="background:var(--green-dim);color:var(--green)">₮</span>
+                    <div class="wm-option" data-value="usdt" data-cat="crypto" onclick="selectMethod(this, 'crypto', 'ri-coin-line', 'USDT-TRC20')">
+                      <span class="wm-opt-icon" style="background:var(--green-dim);color:var(--green)"><i class="ri-coin-line"></i></span>
                       <span>USDT-TRC20</span>
                     </div>
                   </div>
@@ -2298,7 +2299,7 @@ body::before {
                 <tbody>
                   <tr>
                     <td colspan="5" style="text-align:center;padding:48px 16px;color:var(--text3)">
-                      <div style="font-size:32px;margin-bottom:12px">📭</div>
+                      <div style="font-size:32px;margin-bottom:12px"><i class="ri-inbox-line"></i></div>
                       <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:4px">No transaction history</div>
                       <div style="font-size:12px">Your withdrawal and transfer records will appear here</div>
                     </td>
@@ -2314,7 +2315,7 @@ body::before {
         <div class="funds-info" id="fundsInfoPanel">
           <div class="funds-step-tracker">
             <div class="fst-step" id="fstStep1">
-              <div class="fst-icon active">📤</div>
+              <div class="fst-icon active"><i class="ri-upload-2-line"></i></div>
               <div>
                 <div class="fst-title active">Request Withdrawal</div>
                 <div class="fst-desc">Begin by entering the amount you wish to withdraw from your account.</div>
@@ -2322,7 +2323,7 @@ body::before {
             </div>
             <div class="fst-line" id="fstLine"></div>
             <div class="fst-step" id="fstStep2">
-              <div class="fst-icon">💳</div>
+              <div class="fst-icon"><i class="ri-bank-card-line"></i></div>
               <div>
                 <div class="fst-title">Select Withdrawal Method</div>
                 <div class="fst-desc">Choose your preferred method for receiving the funds, ensuring it suits your needs.</div>
@@ -2524,8 +2525,8 @@ function toggleSidebar() {
 function copyCode() {
   navigator.clipboard.writeText('https://marketscore.app/join/MS-JOHN').then(() => {
     const b = document.querySelector('.btn-primary');
-    b.textContent = '✓ Copied!';
-    setTimeout(() => b.textContent = '📋 Copy Link', 2000);
+    b.innerHTML = '<i class="ri-check-line"></i> Copied!';
+    setTimeout(() => b.textContent = '<i class="ri-file-copy-line"></i> Copy Link', 2000);
   });
 }
 
@@ -2640,7 +2641,7 @@ function selectMethod(el, methodType, icon, label) {
   // Update hidden input
   document.getElementById('withdrawMethod').value = methodType;
   // Update selected display
-  document.getElementById('wmSelectedIcon').textContent = icon;
+  document.getElementById('wmSelectedIcon').innerHTML = '<i class="' + icon + '"></i>';
   document.getElementById('wmSelectedLabel').textContent = label;
   // Update active state
   document.querySelectorAll('.wm-option').forEach(function(o) { o.classList.remove('active'); });
