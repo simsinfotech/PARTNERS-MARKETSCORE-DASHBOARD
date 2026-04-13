@@ -1651,7 +1651,7 @@ body::before {
 
       <!-- Summary Row -->
       <div class="mu-summary">
-        <span>Total User Account Record: <b style="color:var(--text)">6</b></span>
+        <span>Total User Account Record: <b style="color:var(--text)" id="myUsersTotalCount">0</b></span>
         <button class="btn btn-secondary" style="padding:6px 16px;font-size:12px">📥 Export</button>
       </div>
 
@@ -1672,78 +1672,13 @@ body::before {
               <th>Total Deposit</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="myUsersTableBody">
             <tr>
-              <td>1</td>
-              <td class="mono">30094</td>
-              <td>ZEESHAN A</td>
-              <td>Pakistan</td>
-              <td><span class="badge badge-active">Client</span></td>
-              <td class="mono">+92 312 *****78</td>
-              <td>zee***@gmail.com</td>
-              <td>MS-JOHN</td>
-              <td class="mono" style="color:var(--green)">$4,250.00</td>
-              <td class="mono" style="color:var(--gold)">$12,500.00</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td class="mono">30095</td>
-              <td>KHOULA FA</td>
-              <td>UAE</td>
-              <td><span class="badge badge-active">Client</span></td>
-              <td class="mono">+971 50 *****23</td>
-              <td>kho***@gmail.com</td>
-              <td>MS-JOHN</td>
-              <td class="mono" style="color:var(--green)">$8,120.50</td>
-              <td class="mono" style="color:var(--gold)">$25,000.00</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td class="mono">30096</td>
-              <td>Shridhar S T</td>
-              <td>India</td>
-              <td><span class="badge badge-new">IB Agent</span></td>
-              <td class="mono">+91 98 *****45</td>
-              <td>shr***@yahoo.com</td>
-              <td>MS-JOHN</td>
-              <td class="mono" style="color:var(--green)">$15,340.00</td>
-              <td class="mono" style="color:var(--gold)">$42,000.00</td>
-            </tr>
-            <tr>
-              <td>4</td>
-              <td class="mono">30097</td>
-              <td>Salma Ansari</td>
-              <td>India</td>
-              <td><span class="badge badge-active">Client</span></td>
-              <td class="mono">+91 88 *****12</td>
-              <td>sal***@gmail.com</td>
-              <td>MS-JOHN</td>
-              <td class="mono" style="color:var(--green)">$2,890.75</td>
-              <td class="mono" style="color:var(--gold)">$8,500.00</td>
-            </tr>
-            <tr>
-              <td>5</td>
-              <td class="mono">30098</td>
-              <td>SHRIDHAR</td>
-              <td>India</td>
-              <td><span class="badge badge-active">Client</span></td>
-              <td class="mono">+91 77 *****89</td>
-              <td>shr***@outlook.com</td>
-              <td>MS-JOHN</td>
-              <td class="mono" style="color:var(--green)">$6,475.25</td>
-              <td class="mono" style="color:var(--gold)">$18,200.00</td>
-            </tr>
-            <tr>
-              <td>6</td>
-              <td class="mono">30099</td>
-              <td>Mahesh Ku</td>
-              <td>India</td>
-              <td><span class="badge badge-active">Client</span></td>
-              <td class="mono">+91 99 *****34</td>
-              <td>mah***@gmail.com</td>
-              <td>MS-JOHN</td>
-              <td class="mono" style="color:var(--green)">$1,120.00</td>
-              <td class="mono" style="color:var(--gold)">$3,750.00</td>
+              <td colspan="10" style="text-align:center;padding:48px 16px;color:var(--text3)">
+                <div style="font-size:32px;margin-bottom:12px">📭</div>
+                <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:4px">No user data available</div>
+                <div style="font-size:12px">User records will appear here once connected to a data source</div>
+              </td>
             </tr>
           </tbody>
         </table>
