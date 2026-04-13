@@ -2473,9 +2473,30 @@ function toggleMethodFields() {
 }
 
 function toggleBankForm() {
-  var val = document.getElementById('bankAccount').value;
+  var sel = document.getElementById('bankAccount');
+  var val = sel.value;
+  var opt = sel.options[sel.selectedIndex];
   document.getElementById('bank-existing').style.display = val === 'add_new' ? 'none' : 'block';
   document.getElementById('bank-add-new').style.display = val === 'add_new' ? 'block' : 'none';
+  // If a saved account is selected, populate the read-only fields
+  if (val !== 'add_new' && val !== 'existing') {
+    var existingDiv = document.getElementById('bank-existing');
+    var bankNameSel = existingDiv.querySelector('#bankName');
+    bankNameSel.innerHTML = '<option>' + (opt.getAttribute('data-bank') || '') + '</option>';
+    var inputs = existingDiv.querySelectorAll('input.funds-input');
+    if (inputs[0]) inputs[0].value = opt.getAttribute('data-ifsc') || '';
+    if (inputs[1]) inputs[1].value = opt.getAttribute('data-branch') || '';
+    if (inputs[2]) inputs[2].value = opt.getAttribute('data-accname') || '';
+  } else if (val === 'existing') {
+    // Reset to original hardcoded values
+    var existingDiv = document.getElementById('bank-existing');
+    var bankNameSel = existingDiv.querySelector('#bankName');
+    bankNameSel.innerHTML = '<option>Axis Bank</option>';
+    var inputs = existingDiv.querySelectorAll('input.funds-input');
+    if (inputs[0]) inputs[0].value = 'UTIB0005369';
+    if (inputs[1]) inputs[1].value = 'Kothanur';
+    if (inputs[2]) inputs[2].value = 'Shamique Hussain Vellore Javeed';
+  }
   // Show minimum warning for new bank if amount is low
   var amt = parseFloat(document.getElementById('withdrawAmount').value) || 0;
   var warn = document.getElementById('bankMinWarning');
@@ -2520,6 +2541,44 @@ function submitWithdrawal() {
     }
     document.getElementById('cryptoWalletNote').style.display = 'none';
     document.getElementById('cryptoWallet').style.borderColor = '';
+  }
+  // If adding a new bank account, save it to the dropdown
+  if (method === 'bank' && document.getElementById('bankAccount').value === 'add_new') {
+    var bankName = document.getElementById('newBankName').value;
+    var accName = document.getElementById('newAccName').value.trim();
+    var accNumber = document.getElementById('newAccNumber').value.trim();
+    var ifsc = document.getElementById('newIfsc').value.trim();
+    var branch = document.getElementById('newBranch').value.trim();
+    if (!bankName || !accName || !accNumber) {
+      alert('Please fill in Bank Name, Account Name, and Account Number.');
+      return;
+    }
+    // Add the new account to dropdown if "Remember my account" is checked
+    if (document.getElementById('rememberBank').checked) {
+      var masked = accNumber.length > 4 ? '****' + accNumber.slice(-4) : accNumber;
+      var label = bankName + ' - ' + accName + ' ' + masked;
+      var sel = document.getElementById('bankAccount');
+      var newOpt = document.createElement('option');
+      newOpt.value = 'saved_' + Date.now();
+      newOpt.textContent = label;
+      newOpt.setAttribute('data-bank', bankName);
+      newOpt.setAttribute('data-ifsc', ifsc);
+      newOpt.setAttribute('data-branch', branch);
+      newOpt.setAttribute('data-accname', accName);
+      newOpt.setAttribute('data-accnumber', accNumber);
+      // Insert before the "+ Add Bank Account" option
+      var addNewOpt = sel.querySelector('option[value="add_new"]');
+      sel.insertBefore(newOpt, addNewOpt);
+      sel.value = newOpt.value;
+      toggleBankForm();
+    }
+    // Clear form fields
+    document.getElementById('newBankName').value = '';
+    document.getElementById('newIfsc').value = '';
+    document.getElementById('newBranch').value = '';
+    document.getElementById('newAccName').value = '';
+    document.getElementById('newAccNumber').value = '';
+    document.getElementById('newBankNotes').value = '';
   }
   var amt = document.getElementById('step2AmountDisplay').textContent;
   alert('Withdrawal request for ' + amt + ' via ' + (method === 'bank' ? 'Bank Transfer' : 'USDT-TRC20') + ' submitted. This will be connected to a backend.');
