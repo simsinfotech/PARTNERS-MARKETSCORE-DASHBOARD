@@ -1430,6 +1430,128 @@ body::before {
 }
 
 .fst-line.active { background: var(--green); }
+
+/* ─── Withdrawal Method Selector ─── */
+.wm-selector {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.wm-selected {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: border-color 0.2s;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.wm-selected:hover { border-color: var(--border-h); }
+
+.wm-selected-icon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+}
+
+.wm-arrow {
+  margin-left: auto;
+  color: var(--text3);
+  font-size: 12px;
+  transition: transform 0.2s;
+}
+
+.wm-arrow.open { transform: rotate(180deg); }
+
+.wm-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--card);
+  border: 1px solid var(--border-h);
+  border-radius: var(--radius);
+  padding: 16px;
+  z-index: 20;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  animation: fadeIn 0.15s ease-out;
+}
+
+.wm-dropdown-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+  margin-bottom: 12px;
+}
+
+.wm-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.wm-tab {
+  padding: 5px 12px;
+  border-radius: var(--radius-xs);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  transition: all 0.2s;
+}
+
+.wm-tab.active {
+  background: rgba(255,255,255,0.07);
+  color: var(--text);
+}
+
+.wm-tab:hover:not(.active) { color: var(--text2); }
+
+.wm-options {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wm-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  transition: all 0.15s;
+}
+
+.wm-option:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+
+.wm-option.active {
+  background: var(--green-dim);
+  color: var(--green);
+}
+
+.wm-opt-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
@@ -2007,11 +2129,41 @@ body::before {
                 Exchange Rate(USD/INR) : 91.6335 &nbsp;&nbsp; Approximately ≈<span id="step2InrAmount">68.73</span> INR
               </div>
 
-              <div class="funds-field">
-                <select class="funds-select" id="withdrawMethod" onchange="toggleMethodFields()">
-                  <option value="bank">India Bank Transfer</option>
-                  <option value="crypto">USDT-TRC20</option>
-                </select>
+              <!-- Custom Method Selector -->
+              <input type="hidden" id="withdrawMethod" value="bank" />
+              <div class="wm-selector">
+                <div class="wm-selected" onclick="toggleMethodDropdown()">
+                  <span class="wm-selected-icon" id="wmSelectedIcon">🏦</span>
+                  <span id="wmSelectedLabel">India Bank Transfer</span>
+                  <span class="wm-arrow" id="wmArrow">▾</span>
+                </div>
+                <div class="wm-dropdown" id="wmDropdown" style="display:none">
+                  <div class="wm-dropdown-title">Select Withdrawal Method</div>
+                  <div class="wm-tabs">
+                    <button class="wm-tab active" onclick="filterMethods('all', this)">All</button>
+                    <button class="wm-tab" onclick="filterMethods('bank', this)">Local Bank Transfer</button>
+                    <button class="wm-tab" onclick="filterMethods('crypto', this)">Cryptocurrency</button>
+                    <button class="wm-tab" onclick="filterMethods('offline', this)">Offline Transfer</button>
+                  </div>
+                  <div class="wm-options" id="wmOptions">
+                    <div class="wm-option active" data-value="bank" data-cat="bank" onclick="selectMethod(this, 'bank', '🏦', 'India Bank Transfer')">
+                      <span class="wm-opt-icon" style="background:var(--blue-dim);color:var(--blue)">🏦</span>
+                      <span>India Bank Transfer</span>
+                    </div>
+                    <div class="wm-option" data-value="eth" data-cat="crypto" onclick="selectMethod(this, 'crypto', '⟠', 'ETH')">
+                      <span class="wm-opt-icon" style="background:var(--purple-dim);color:var(--purple)">⟠</span>
+                      <span>ETH</span>
+                    </div>
+                    <div class="wm-option" data-value="btc" data-cat="crypto" onclick="selectMethod(this, 'crypto', '₿', 'BTC')">
+                      <span class="wm-opt-icon" style="background:var(--gold-dim);color:var(--gold)">₿</span>
+                      <span>BTC</span>
+                    </div>
+                    <div class="wm-option" data-value="usdt" data-cat="crypto" onclick="selectMethod(this, 'crypto', '₮', 'USDT-TRC20')">
+                      <span class="wm-opt-icon" style="background:var(--green-dim);color:var(--green)">₮</span>
+                      <span>USDT-TRC20</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <!-- Bank Transfer Fields -->
@@ -2471,6 +2623,57 @@ function toggleMethodFields() {
   checkCryptoMin(amt);
   if (method === 'bank') toggleBankForm();
 }
+
+function toggleMethodDropdown() {
+  var dd = document.getElementById('wmDropdown');
+  var arrow = document.getElementById('wmArrow');
+  if (dd.style.display === 'none') {
+    dd.style.display = 'block';
+    arrow.classList.add('open');
+  } else {
+    dd.style.display = 'none';
+    arrow.classList.remove('open');
+  }
+}
+
+function selectMethod(el, methodType, icon, label) {
+  // Update hidden input
+  document.getElementById('withdrawMethod').value = methodType;
+  // Update selected display
+  document.getElementById('wmSelectedIcon').textContent = icon;
+  document.getElementById('wmSelectedLabel').textContent = label;
+  // Update active state
+  document.querySelectorAll('.wm-option').forEach(function(o) { o.classList.remove('active'); });
+  el.classList.add('active');
+  // Close dropdown
+  document.getElementById('wmDropdown').style.display = 'none';
+  document.getElementById('wmArrow').classList.remove('open');
+  // Toggle fields
+  toggleMethodFields();
+}
+
+function filterMethods(cat, tabEl) {
+  // Update tab active state
+  document.querySelectorAll('.wm-tab').forEach(function(t) { t.classList.remove('active'); });
+  tabEl.classList.add('active');
+  // Show/hide options
+  document.querySelectorAll('.wm-option').forEach(function(opt) {
+    if (cat === 'all' || opt.getAttribute('data-cat') === cat) {
+      opt.style.display = 'flex';
+    } else {
+      opt.style.display = 'none';
+    }
+  });
+}
+
+// Close method dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  var selector = document.querySelector('.wm-selector');
+  if (selector && !selector.contains(e.target)) {
+    document.getElementById('wmDropdown').style.display = 'none';
+    document.getElementById('wmArrow').classList.remove('open');
+  }
+});
 
 function toggleBankForm() {
   var sel = document.getElementById('bankAccount');
