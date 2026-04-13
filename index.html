@@ -1,1429 +1,1991 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MarketScore — Partner Program</title>
-  <link rel="icon" type="image/png" href="App Icon.png" />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-</head>
-<body>
-  <div id="root"></div>
-  <script type="text/babel">
-const { useState, useEffect, useRef, useCallback } = React;
-
-/* ─── SVG Icon Components (Lucide-style) ─── */
-const Icon = ({ children, size = 24, color = "currentColor", style = {}, ...props }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24"
-    fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-    style={{ display: "inline-block", verticalAlign: "middle", flexShrink: 0, ...style }} {...props}>
-    {children}
-  </svg>
-);
-
-// Tier icons
-const IconBronzeMedal = ({ size, color, style }) => (
-  <Icon size={size} color={color} style={style}>
-    <circle cx="12" cy="8" r="6" fill={color || "#cd7f32"} stroke={color || "#cd7f32"} strokeWidth="1.5" opacity="0.2" />
-    <circle cx="12" cy="8" r="6" />
-    <path d="M12 2v2" /><path d="M12 14v2" />
-    <path d="m8 16-2 6h12l-2-6" />
-    <path d="M9 14.5 12 12l3 2.5" />
-  </Icon>
-);
-
-const IconSilverMedal = ({ size, color, style }) => (
-  <Icon size={size} color={color} style={style}>
-    <circle cx="12" cy="8" r="6" fill={color || "#c0c0c0"} stroke={color || "#c0c0c0"} strokeWidth="1.5" opacity="0.2" />
-    <circle cx="12" cy="8" r="6" />
-    <path d="m8 16-2 6h12l-2-6" />
-    <path d="M10 6h4l-2 4-2-4z" fill={color || "#c0c0c0"} opacity="0.4" />
-  </Icon>
-);
-
-const IconGoldMedal = ({ size, color, style }) => (
-  <Icon size={size} color={color} style={style}>
-    <circle cx="12" cy="8" r="6" fill={color || "#ffc44d"} stroke={color || "#ffc44d"} strokeWidth="1.5" opacity="0.25" />
-    <circle cx="12" cy="8" r="6" />
-    <path d="m8 16-2 6h12l-2-6" />
-    <polygon points="12,4 13.5,7 17,7.5 14.5,10 15,13.5 12,12 9,13.5 9.5,10 7,7.5 10.5,7" fill={color || "#ffc44d"} opacity="0.4" stroke="none" />
-  </Icon>
-);
-
-const IconDiamond = ({ size, color, style }) => (
-  <Icon size={size} color={color} style={style}>
-    <path d="M6 3h12l4 6-10 13L2 9z" fill={color || "#b9f2ff"} opacity="0.15" />
-    <path d="M6 3h12l4 6-10 13L2 9z" />
-    <path d="M2 9h20" /><path d="m10 3-4 6 6 13 6-13-4-6" />
-  </Icon>
-);
-
-const IconCrown = ({ size, color, style }) => (
-  <Icon size={size} color={color} style={style}>
-    <path d="M2 17 5 8l4 4 3-6 3 6 4-4 3 9z" fill={color || "#e5e4e2"} opacity="0.2" />
-    <path d="M2 17 5 8l4 4 3-6 3 6 4-4 3 9z" />
-    <path d="M4 19h16" strokeWidth="2.5" />
-  </Icon>
-);
-
-// Feature / Section icons
-const IconRadar = ({ size = 24, color = "currentColor", style }) => (
-  <Icon size={size} color={color} style={style}>
-    <path d="M19.07 4.93A10 10 0 0 0 2 12c0 5.52 4.48 10 10 10s10-4.48 10-10" />
-    <path d="M15.54 8.46A5 5 0 0 0 7 12c0 2.76 2.24 5 5 5s5-2.24 5-5" />
-    <line x1="12" y1="12" x2="20" y2="4" />
-  </Icon>
-);
-
-const IconBarChart = ({ size = 24, color = "currentColor", style }) => (
-  <Icon size={size} color={color} style={style}>
-    <rect x="3" y="12" width="4" height="9" rx="1" fill={color} opacity="0.15" />
-    <rect x="10" y="7" width="4" height="14" rx="1" fill={color} opacity="0.15" />
-    <rect x="17" y="3" width="4" height="18" rx="1" fill={color} opacity="0.15" />
-    <rect x="3" y="12" width="4" height="9" rx="1" /><rect x="10" y="7" width="4" height="14" rx="1" /><rect x="17" y="3" width="4" height="18" rx="1" />
-  </Icon>
-);
-
-const IconPalette = ({ size = 24, color = "currentColor", style }) => (
-  <Icon size={size} color={color} style={style}>
-    <circle cx="13.5" cy="6.5" r="1.5" fill={color} opacity="0.4" /><circle cx="17.5" cy="10.5" r="1.5" fill={color} opacity="0.4" />
-    <circle cx="8.5" cy="7.5" r="1.5" fill={color} opacity="0.4" /><circle cx="6.5" cy="12.5" r="1.5" fill={color} opacity="0.4" />
-    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.04-.23-.29-.38-.63-.38-1.03 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-5.17-4.5-9-10-9z" />
-  </Icon>
-);
-
-const IconShield = ({ size = 24, color = "currentColor", style }) => (
-  <Icon size={size} color={color} style={style}>
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill={color} opacity="0.12" />
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    <path d="m9 12 2 2 4-4" />
-  </Icon>
-);
-
-const IconHandshake = ({ size = 24, color = "currentColor", style }) => (
-  <Icon size={size} color={color} style={style}>
-    <path d="m11 17 2 2a1 1 0 1 0 3-3" /><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3L14 8" />
-    <path d="m8 15 2-2" /><path d="m2 10 4-4 4 4" /><path d="m14 4 4 4 4-4" />
-    <path d="M3 13h2" /><path d="M19 13h2" />
-  </Icon>
-);
-
-const IconZap = ({ size = 24, color = "currentColor", style }) => (
-  <Icon size={size} color={color} style={style}>
-    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill={color} opacity="0.15" />
-    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-  </Icon>
-);
-
-const IconTarget = ({ size = 24, color = "currentColor", style }) => (
-  <Icon size={size} color={color} style={style}>
-    <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" fill={color} opacity="0.3" />
-    <line x1="22" y1="12" x2="18" y2="12" /><line x1="6" y1="12" x2="2" y2="12" />
-    <line x1="12" y1="6" x2="12" y2="2" /><line x1="12" y1="22" x2="12" y2="18" />
-  </Icon>
-);
-
-const IconTrophy = ({ size = 24, color = "currentColor", style }) => (
-  <Icon size={size} color={color} style={style}>
-    <path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2" /><path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2" />
-    <path d="M6 3h12v7a6 6 0 0 1-12 0V3z" fill={color} opacity="0.12" />
-    <path d="M6 3h12v7a6 6 0 0 1-12 0V3z" />
-    <path d="M9 21h6" /><path d="M12 16v5" />
-  </Icon>
-);
-
-const IconDollarSign = ({ size = 24, color = "currentColor", style }) => (
-  <Icon size={size} color={color} style={style}>
-    <circle cx="12" cy="12" r="10" fill={color} opacity="0.1" />
-    <line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-  </Icon>
-);
-
-const IconArrowRight = ({ size = 24, color = "currentColor", style }) => (
-  <Icon size={size} color={color} style={style}>
-    <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
-  </Icon>
-);
-
-const IconArrowDown = ({ size = 24, color = "currentColor", style }) => (
-  <Icon size={size} color={color} style={style}>
-    <line x1="12" y1="5" x2="12" y2="19" /><polyline points="19 12 12 19 5 12" />
-  </Icon>
-);
-
-const IconCheck = ({ size = 24, color = "currentColor", style }) => (
-  <Icon size={size} color={color} style={style}>
-    <polyline points="20 6 9 17 4 12" />
-  </Icon>
-);
-
-const IconCode = ({ size = 24, color = "currentColor", style }) => (
-  <Icon size={size} color={color} style={style}>
-    <polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" />
-  </Icon>
-);
-
-const IconUsers = ({ size = 24, color = "currentColor", style }) => (
-  <Icon size={size} color={color} style={style}>
-    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-    <circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
-  </Icon>
-);
-
-const IconTrendingUp = ({ size = 24, color = "currentColor", style }) => (
-  <Icon size={size} color={color} style={style}>
-    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" />
-  </Icon>
-);
-
-// Map tier names to icon components
-const TIER_ICONS = {
-  Bronze: IconBronzeMedal,
-  Silver: IconSilverMedal,
-  Gold: IconGoldMedal,
-  Diamond: IconDiamond,
-  Platinum: IconCrown,
-};
-
-const C = {
-  bg: "#04070D", surface: "#0B1120", card: "#111B2E",
-  border: "#1A2744", accent: "#00E5B0", accentDark: "#00B88E",
-  red: "#FF4757", gold: "#FFB800", blue: "#4A9EFF",
-  purple: "#A855F7",
-  text: "#F0F4F8", textSec: "#8B9DC3", textMuted: "#4A5D80",
-  wa: "#25D366",
-};
-
-const WA_LINK = "https://wa.me/919036317766";
-
-const analytics = {
-  _q: [], _start: Date.now(), _scroll: 0, _n: 0,
-  init() {
-    const p = new URLSearchParams(window.location.search);
-    this._ref = p.get("ref") || "direct";
-    this.track("page_view", { source: "partner_program", ref: this._ref });
-    let fired = new Set();
-    window.addEventListener("scroll", () => {
-      const pct = Math.round((window.pageYOffset / (document.documentElement.scrollHeight - window.innerHeight)) * 100);
-      this._scroll = Math.max(this._scroll, pct);
-      [25, 50, 75, 100].forEach(m => { if (pct >= m && !fired.has(m)) { fired.add(m); this.track("scroll", { depth: m }); } });
-    }, { passive: true });
-  },
-  track(e, d = {}) {
-    this._n++;
-    const p = { event: e, t: Math.round((Date.now() - this._start) / 1000), ...d };
-    this._q.push(p);
-    try { if (window.gtag) window.gtag("event", e, { ...d, source: "partner_program" }); } catch {}
-    if (window.location.hostname === "localhost") console.log(`[MS-PP] ${e}`, p);
-  },
-};
-
-const PARTNER_TIERS = [
-  { name: "Bronze", rate: 7, max: 200, color: "#cd7f32" },
-  { name: "Silver", rate: 8, max: 500, color: "#c0c0c0" },
-  { name: "Gold", rate: 9, max: 1000, color: "#ffc44d" },
-  { name: "Diamond", rate: 10, max: 1500, color: "#b9f2ff" },
-  { name: "Platinum", rate: 12, max: Infinity, color: "#e5e4e2" },
-];
-
-const getPartnerTier = (users) => {
-  for (const t of PARTNER_TIERS) { if (users <= t.max) return t; }
-  return PARTNER_TIERS[PARTNER_TIERS.length - 1];
-};
-
-/* ─── Particle Canvas ─── */
-const ParticleCanvas = () => {
-  const canvasRef = useRef(null);
-  const mouseRef = useRef({ x: -1000, y: -1000 });
-  const particlesRef = useRef([]);
-  const animRef = useRef(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    let w, h;
-
-    const resize = () => {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
-    };
-    resize();
-    window.addEventListener("resize", resize);
-
-    const isMobile = window.innerWidth < 768;
-    const count = isMobile ? 70 : 180;
-    const particles = [];
-
-    for (let i = 0; i < count; i++) {
-      particles.push({
-        x: Math.random() * w, y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.7, vy: (Math.random() - 0.5) * 0.7,
-        r: Math.random() * 3 + 1,
-        o: Math.random() * 0.6 + 0.3,
-        pulse: Math.random() * Math.PI * 2,
-        pulseSpeed: Math.random() * 0.02 + 0.01,
-      });
-    }
-    particlesRef.current = particles;
-
-    const draw = () => {
-      ctx.clearRect(0, 0, w, h);
-      const mx = mouseRef.current.x;
-      const my = mouseRef.current.y;
-
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        // Mouse interaction — larger radius, stronger force
-        const dx = p.x - mx;
-        const dy = p.y - my;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 220 && dist > 0) {
-          const force = (220 - dist) / 220 * 1.2;
-          p.vx += (dx / dist) * force;
-          p.vy += (dy / dist) * force;
-        }
-
-        p.vx *= 0.97;
-        p.vy *= 0.97;
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.x < 0) p.x = w;
-        if (p.x > w) p.x = 0;
-        if (p.y < 0) p.y = h;
-        if (p.y > h) p.y = 0;
-
-        // Pulsing glow per particle
-        p.pulse += p.pulseSpeed;
-        const pulseAlpha = p.o * (0.7 + 0.3 * Math.sin(p.pulse));
-
-        // Outer glow
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0, 229, 176, ${pulseAlpha * 0.08})`;
-        ctx.fill();
-
-        // Core particle
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0, 229, 176, ${pulseAlpha})`;
-        ctx.fill();
-
-        // Bright center dot
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r * 0.4, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${pulseAlpha * 0.6})`;
-        ctx.fill();
-
-        // Connection lines — longer range, brighter
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          const cdx = p.x - p2.x;
-          const cdy = p.y - p2.y;
-          const cd = Math.sqrt(cdx * cdx + cdy * cdy);
-          if (cd < 160) {
-            const lineAlpha = 0.15 * (1 - cd / 160);
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(0, 229, 176, ${lineAlpha})`;
-            ctx.lineWidth = 0.8;
-            ctx.stroke();
-          }
-        }
-
-        // Mouse proximity glow line
-        if (dist < 200 && dist > 0) {
-          const glowAlpha = 0.25 * (1 - dist / 200);
-          ctx.beginPath();
-          ctx.moveTo(p.x, p.y);
-          ctx.lineTo(mx, my);
-          ctx.strokeStyle = `rgba(0, 229, 176, ${glowAlpha})`;
-          ctx.lineWidth = 0.6;
-          ctx.stroke();
-        }
-      }
-      animRef.current = requestAnimationFrame(draw);
-    };
-    draw();
-
-    return () => {
-      window.removeEventListener("resize", resize);
-      if (animRef.current) cancelAnimationFrame(animRef.current);
-    };
-  }, []);
-
-  const handleMouseMove = useCallback((e) => {
-    mouseRef.current = { x: e.clientX, y: e.clientY };
-  }, []);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      onMouseMove={handleMouseMove}
-      style={{
-        position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
-        pointerEvents: "auto", zIndex: 0,
-      }}
-    />
-  );
-};
-
-/* ─── Animated Counter ─── */
-const AnimatedCounter = ({ end, prefix = "", suffix = "", duration = 2000, decimals = 0, trigger = true }) => {
-  const [val, setVal] = useState(0);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    if (!trigger) return;
-    let start = 0;
-    const startTime = performance.now();
-    const animate = (now) => {
-      const progress = Math.min((now - startTime) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setVal(eased * end);
-      if (progress < 1) ref.current = requestAnimationFrame(animate);
-    };
-    ref.current = requestAnimationFrame(animate);
-    return () => { if (ref.current) cancelAnimationFrame(ref.current); };
-  }, [end, duration, trigger]);
-
-  return (
-    <span style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-      {prefix}{decimals > 0 ? val.toFixed(decimals) : Math.round(val).toLocaleString()}{suffix}
-    </span>
-  );
-};
-
-/* ─── Intersection Observer Hook ─── */
-const useInView = (options = {}) => {
-  const ref = useRef(null);
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) { setInView(true); obs.disconnect(); }
-    }, { threshold: 0.15, ...options });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-  return [ref, inView];
-};
-
-/* ─── Scroll Animated Section ─── */
-const ScrollReveal = ({ children, delay = 0, direction = "up", style = {} }) => {
-  const [ref, inView] = useInView();
-  const transforms = {
-    up: "translateY(60px)",
-    down: "translateY(-60px)",
-    left: "translateX(-60px)",
-    right: "translateX(60px)",
-  };
-  return (
-    <div ref={ref} style={{
-      opacity: inView ? 1 : 0,
-      transform: inView ? "translate(0,0)" : transforms[direction],
-      transition: `opacity 0.8s cubic-bezier(0.16,1,0.3,1) ${delay}s, transform 0.8s cubic-bezier(0.16,1,0.3,1) ${delay}s`,
-      ...style,
-    }}>
-      {children}
-    </div>
-  );
-};
-
-/* ─── 3D Tilt Card ─── */
-const TiltCard = ({ children, style = {}, className = "" }) => {
-  const cardRef = useRef(null);
-  const [transform, setTransform] = useState("");
-  const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-
-  const handleMouseMove = (e) => {
-    if (isMobile) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
-    const rotateX = (y - 0.5) * -12;
-    const rotateY = (x - 0.5) * 12;
-    setTransform(`perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`);
-    setGlowPos({ x: x * 100, y: y * 100 });
-  };
-
-  const handleMouseLeave = () => {
-    setTransform("");
-    setGlowPos({ x: 50, y: 50 });
-  };
-
-  return (
-    <div
-      ref={cardRef}
-      className={className}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        transform, transition: transform ? "transform 0.1s ease" : "transform 0.5s cubic-bezier(0.16,1,0.3,1)",
-        position: "relative", overflow: "hidden", ...style,
-      }}
-    >
-      <div style={{
-        position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
-        background: `radial-gradient(circle at ${glowPos.x}% ${glowPos.y}%, ${C.accent}12, transparent 60%)`,
-        pointerEvents: "none", transition: "background 0.2s",
-      }} />
-      {children}
-    </div>
-  );
-};
-
-/* ─── Typewriter ─── */
-const Typewriter = ({ text, speed = 50, delay = 500 }) => {
-  const [displayed, setDisplayed] = useState("");
-  const [started, setStarted] = useState(false);
-
-  useEffect(() => {
-    const t = setTimeout(() => setStarted(true), delay);
-    return () => clearTimeout(t);
-  }, [delay]);
-
-  useEffect(() => {
-    if (!started) return;
-    let i = 0;
-    const iv = setInterval(() => {
-      i++;
-      setDisplayed(text.slice(0, i));
-      if (i >= text.length) clearInterval(iv);
-    }, speed);
-    return () => clearInterval(iv);
-  }, [started, text, speed]);
-
-  return (
-    <span>
-      {displayed}
-      <span style={{
-        display: "inline-block", width: 2, height: "0.9em",
-        background: C.accent, marginLeft: 2, verticalAlign: "middle",
-        animation: "blink 1s step-end infinite",
-        opacity: displayed.length >= text.length ? 0 : 1,
-      }} />
-    </span>
-  );
-};
-
-/* ─── Stats Ticker ─── */
-const StatsTicker = () => {
-  const [ref, inView] = useInView();
-  const stats = [
-    { value: "$72K", label: "Monthly Potential", IconComp: IconDollarSign, color: C.accent },
-    { value: "500+", label: "Active Partners", IconComp: IconUsers, color: C.blue },
-    { value: "5", label: "Commission Tiers", IconComp: IconTrophy, color: C.gold },
-    { value: "$12", label: "Max Per Lot", IconComp: IconZap, color: C.purple },
-    { value: "0%", label: "Platform Fees", IconComp: IconShield, color: C.accent },
-  ];
-
-  const marqueeItems = [
-    "Real-time dashboard", "Monthly payouts", "No follower minimum",
-    "AI-powered signals", "Zero fees", "Branded content assets",
-    "Crypto & bank payouts", "Auto tier upgrades", "Performance wins",
-  ];
-  const doubled = [...marqueeItems, ...marqueeItems];
-
-  return (
-    <div ref={ref} style={{ position: "relative", overflow: "hidden" }}>
-      {/* Glowing top border */}
-      <div style={{
-        height: 1,
-        background: `linear-gradient(90deg, transparent, ${C.accent}60, ${C.blue}60, ${C.purple}60, transparent)`,
-      }} />
-
-      {/* Main stats row */}
-      <div style={{
-        background: `linear-gradient(180deg, ${C.surface}F0, ${C.bg}F0)`,
-        backdropFilter: "blur(10px)",
-        padding: "28px 0 20px",
-      }}>
-        <div style={{
-          maxWidth: 1000, margin: "0 auto", padding: "0 24px",
-          display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 16,
-        }}>
-          {stats.map((s, i) => (
-            <div key={i} style={{
-              flex: "1 1 160px", textAlign: "center",
-              opacity: inView ? 1 : 0,
-              transform: inView ? "translateY(0)" : "translateY(20px)",
-              transition: `all 0.6s cubic-bezier(0.16,1,0.3,1) ${i * 0.1}s`,
-            }}>
-              <div style={{ marginBottom: 6 }}><s.IconComp size={24} color={s.color} /></div>
-              <div style={{
-                fontFamily: "'Outfit', sans-serif", fontSize: 32, fontWeight: 900,
-                letterSpacing: -1.5,
-                background: `linear-gradient(135deg, ${s.color}, ${s.color}AA)`,
-                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                lineHeight: 1,
-              }}>
-                {inView ? s.value : "—"}
-              </div>
-              <div style={{
-                fontFamily: "'JetBrains Mono', monospace", fontSize: 10,
-                letterSpacing: 1.5, textTransform: "uppercase", color: C.textMuted,
-                marginTop: 6,
-              }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Animated marquee strip below */}
-      <div style={{
-        overflow: "hidden", padding: "10px 0",
-        background: `${C.bg}`,
-        borderTop: `1px solid ${C.border}30`,
-        position: "relative",
-      }}>
-        {/* Fade edges */}
-        <div style={{
-          position: "absolute", top: 0, left: 0, bottom: 0, width: 80, zIndex: 2,
-          background: `linear-gradient(90deg, ${C.bg}, transparent)`,
-        }} />
-        <div style={{
-          position: "absolute", top: 0, right: 0, bottom: 0, width: 80, zIndex: 2,
-          background: `linear-gradient(270deg, ${C.bg}, transparent)`,
-        }} />
-        <div style={{
-          display: "flex", gap: 0, whiteSpace: "nowrap",
-          animation: "ticker 25s linear infinite",
-        }}>
-          {doubled.map((item, i) => (
-            <span key={i} style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              padding: "4px 24px",
-              fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 500,
-              color: C.textMuted,
-              letterSpacing: 0.5,
-            }}>
-              <span style={{
-                width: 5, height: 5, borderRadius: "50%",
-                background: `linear-gradient(135deg, ${C.accent}, ${C.blue})`,
-                boxShadow: `0 0 6px ${C.accent}40`,
-              }} />
-              {item}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* Glowing bottom border */}
-      <div style={{
-        height: 1,
-        background: `linear-gradient(90deg, transparent, ${C.purple}60, ${C.accent}60, ${C.gold}60, transparent)`,
-      }} />
-    </div>
-  );
-};
-
-/* ─── Earnings Calculator with Sliders & Chart ─── */
-const EarningsCalculator = () => {
-  const [users, setUsers] = useState(300);
-  const [lots, setLots] = useState(3);
-  const [ref, inView] = useInView();
-
-  const tierData = PARTNER_TIERS.map(t => {
-    const u = t.name === "Platinum" ? 2000 : t.max;
-    const monthly = t.rate * u * lots;
-    return { ...t, earnings: monthly, userCount: u };
-  });
-
-  const currentTier = getPartnerTier(users);
-  const totalLots = users * lots;
-  const monthly = currentTier.rate * totalLots;
-  const annual = monthly * 12;
-  const maxEarnings = Math.max(...tierData.map(t => t.earnings));
-
-  return (
-    <ScrollReveal>
-      <div ref={ref} style={{
-        background: C.surface, border: `1px solid ${C.border}`, borderRadius: 22,
-        padding: "40px 32px", marginTop: 50, position: "relative", overflow: "hidden",
-      }}>
-        <div style={{
-          position: "absolute", top: 0, right: 0, width: 280, height: 280,
-          background: `radial-gradient(circle, ${C.accent}08, transparent 70%)`,
-          pointerEvents: "none",
-        }} />
-        <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 6, fontFamily: "'Outfit', sans-serif" }}>
-          Earnings Calculator
-        </div>
-        <div style={{ color: C.textSec, fontSize: 14, marginBottom: 32, fontFamily: "'Space Grotesk', sans-serif" }}>
-          Drag the sliders to see your potential earnings
-        </div>
-
-        {/* Sliders */}
-        <div className="calc-grid-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 28, marginBottom: 32 }}>
-          <div>
-            <label style={{
-              display: "flex", justifyContent: "space-between", alignItems: "center",
-              fontSize: 11, letterSpacing: 1.5, textTransform: "uppercase", color: C.textMuted,
-              marginBottom: 12, fontFamily: "'JetBrains Mono', monospace",
-            }}>
-              <span>Referred Users</span>
-              <span style={{ color: C.accent, fontSize: 18, fontWeight: 700 }}>{users}</span>
-            </label>
-            <div style={{ position: "relative" }}>
-              <input type="range" min={10} max={2500} value={users}
-                onChange={(e) => setUsers(parseInt(e.target.value))}
-                className="custom-slider"
-                style={{ width: "100%" }}
-              />
-              <div style={{
-                position: "absolute", top: 14, left: 0, height: 4, borderRadius: 2,
-                width: `${(users / 2500) * 100}%`, background: `linear-gradient(90deg, ${C.accent}, #00b4d8)`,
-                pointerEvents: "none", boxShadow: `0 0 12px ${C.accent}60`,
-              }} />
-            </div>
-          </div>
-          <div>
-            <label style={{
-              display: "flex", justifyContent: "space-between", alignItems: "center",
-              fontSize: 11, letterSpacing: 1.5, textTransform: "uppercase", color: C.textMuted,
-              marginBottom: 12, fontFamily: "'JetBrains Mono', monospace",
-            }}>
-              <span>Avg Lots / User / Mo</span>
-              <span style={{ color: C.accent, fontSize: 18, fontWeight: 700 }}>{lots}</span>
-            </label>
-            <div style={{ position: "relative" }}>
-              <input type="range" min={1} max={20} step={0.5} value={lots}
-                onChange={(e) => setLots(parseFloat(e.target.value))}
-                className="custom-slider"
-                style={{ width: "100%" }}
-              />
-              <div style={{
-                position: "absolute", top: 14, left: 0, height: 4, borderRadius: 2,
-                width: `${(lots / 20) * 100}%`, background: `linear-gradient(90deg, ${C.accent}, #00b4d8)`,
-                pointerEvents: "none", boxShadow: `0 0 12px ${C.accent}60`,
-              }} />
-            </div>
-          </div>
-        </div>
-
-        {/* Results */}
-        <div className="calc-result-row" style={{
-          display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14, padding: 24,
-          background: `linear-gradient(135deg, ${C.accent}06, ${C.bg})`,
-          borderRadius: 14, border: `1px solid ${C.accent}15`, marginBottom: 28,
-        }}>
-          <div>
-            <div style={{ fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 3 }}>Your Tier</div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: currentTier.color, fontFamily: "'Outfit', sans-serif" }}>{currentTier.name} · ${currentTier.rate}</div>
-          </div>
-          <div>
-            <div style={{ fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 3 }}>Monthly</div>
-            <div style={{ fontSize: 28, fontWeight: 800, color: C.accent, fontFamily: "'Outfit', sans-serif" }}>
-              {inView ? <AnimatedCounter end={monthly} prefix="$" duration={800} trigger={true} /> : "$0"}
-            </div>
-          </div>
-          <div>
-            <div style={{ fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 3 }}>Annual</div>
-            <div style={{ fontSize: 28, fontWeight: 800, color: C.accent, fontFamily: "'Outfit', sans-serif" }}>
-              {inView ? <AnimatedCounter end={annual} prefix="$" duration={800} trigger={true} /> : "$0"}
-            </div>
-            <div style={{ fontSize: 11, color: C.textMuted, marginTop: 1 }}>Recurring. Passive.</div>
-          </div>
-        </div>
-
-        {/* Bar Chart */}
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 11, letterSpacing: 1.5, textTransform: "uppercase", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 14 }}>
-            Monthly Earnings by Tier (at {lots} lots/user)
-          </div>
-          <div style={{ display: "flex", gap: 8, alignItems: "flex-end", height: 120 }}>
-            {tierData.map((t, i) => {
-              const h = maxEarnings > 0 ? (t.earnings / maxEarnings) * 100 : 0;
-              const isActive = currentTier.name === t.name;
-              return (
-                <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                  <div style={{
-                    fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: isActive ? C.accent : C.textMuted,
-                    fontWeight: isActive ? 700 : 400, whiteSpace: "nowrap",
-                  }}>
-                    ${(t.earnings / 1000).toFixed(0)}K
-                  </div>
-                  <div style={{
-                    width: "100%", height: `${h}%`, minHeight: 4, borderRadius: 6,
-                    background: isActive
-                      ? `linear-gradient(180deg, ${C.accent}, ${C.accentDark})`
-                      : `linear-gradient(180deg, ${C.border}, ${C.bg})`,
-                    transition: "height 0.6s cubic-bezier(0.16,1,0.3,1), background 0.3s",
-                    boxShadow: isActive ? `0 0 16px ${C.accent}40` : "none",
-                  }} />
-                  <div style={{
-                    fontFamily: "'JetBrains Mono', monospace", fontSize: 9,
-                    color: isActive ? t.color : C.textMuted, fontWeight: 600,
-                  }}>{t.name}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div style={{ fontSize: 12, color: C.textMuted, textAlign: "center", lineHeight: 1.5, fontFamily: "'Space Grotesk', sans-serif" }}>
-          Tier auto-upgrades as your user count grows. All lots across all your users count toward your earnings.
-        </div>
-      </div>
-    </ScrollReveal>
-  );
-};
-
-/* ─── Magnetic Button ─── */
-const MagneticButton = ({ children, href, onClick, style = {} }) => {
-  const btnRef = useRef(null);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [showConfetti, setShowConfetti] = useState(false);
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-
-  const handleMouseMove = (e) => {
-    if (isMobile) return;
-    const rect = btnRef.current.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dx = e.clientX - cx;
-    const dy = e.clientY - cy;
-    setOffset({ x: dx * 0.2, y: dy * 0.2 });
-  };
-
-  const handleMouseLeave = () => setOffset({ x: 0, y: 0 });
-
-  const handleClick = (e) => {
-    setShowConfetti(true);
-    setTimeout(() => setShowConfetti(false), 1200);
-    if (onClick) onClick(e);
-  };
-
-  return (
-    <div style={{ position: "relative", display: "inline-block" }}
-      onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
-      {showConfetti && <ConfettiBurst />}
-      <a ref={btnRef} href={href} target="_blank" rel="noopener" onClick={handleClick} style={{
-        display: "inline-flex", alignItems: "center", gap: 10,
-        transform: `translate(${offset.x}px, ${offset.y}px)`,
-        transition: offset.x === 0 ? "transform 0.5s cubic-bezier(0.16,1,0.3,1)" : "transform 0.08s ease",
-        ...style,
-      }}>
-        {children}
-      </a>
-    </div>
-  );
-};
-
-/* ─── Confetti Burst ─── */
-const ConfettiBurst = () => {
-  const [particles] = useState(() =>
-    Array.from({ length: 24 }, (_, i) => ({
-      x: (Math.random() - 0.5) * 200,
-      y: (Math.random() - 0.5) * 200 - 40,
-      r: Math.random() * 360,
-      color: [C.accent, C.gold, C.blue, C.purple, "#FF6B6B"][Math.floor(Math.random() * 5)],
-      size: Math.random() * 6 + 3,
-      delay: Math.random() * 0.2,
-    }))
-  );
-
-  return (
-    <div style={{
-      position: "absolute", top: "50%", left: "50%", pointerEvents: "none", zIndex: 100,
-    }}>
-      {particles.map((p, i) => (
-        <div key={i} style={{
-          position: "absolute", width: p.size, height: p.size,
-          background: p.color, borderRadius: p.size > 5 ? "50%" : 1,
-          animation: `confetti 0.8s cubic-bezier(0.16,1,0.3,1) ${p.delay}s forwards`,
-          opacity: 0,
-          "--cx": `${p.x}px`, "--cy": `${p.y}px`, "--cr": `${p.r}deg`,
-        }} />
-      ))}
-    </div>
-  );
-};
-
-/* ─── Gradient Orbs ─── */
-const GradientOrbs = () => {
-  return (
-    <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
-      <div className="orb orb-1" style={{
-        position: "absolute", width: 500, height: 500, borderRadius: "50%",
-        background: `radial-gradient(circle, ${C.accent}06, transparent 70%)`,
-        top: "10%", left: "-10%",
-      }} />
-      <div className="orb orb-2" style={{
-        position: "absolute", width: 400, height: 400, borderRadius: "50%",
-        background: `radial-gradient(circle, ${C.purple}06, transparent 70%)`,
-        top: "40%", right: "-10%",
-      }} />
-      <div className="orb orb-3" style={{
-        position: "absolute", width: 600, height: 600, borderRadius: "50%",
-        background: `radial-gradient(circle, ${C.blue}04, transparent 70%)`,
-        bottom: "5%", left: "20%",
-      }} />
-    </div>
-  );
-};
-
-/* ─── Hover Reveal Benefit Card ─── */
-const BenefitCard = ({ IconComp, title, desc, color, delay }) => {
-  const [hovered, setHovered] = useState(false);
-
-  return (
-    <ScrollReveal delay={delay}>
-      <div
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        style={{
-          background: C.surface, border: `1px solid ${hovered ? color + "40" : C.border}`,
-          borderRadius: 16, padding: "24px 20px",
-          cursor: "default", transition: "all 0.4s cubic-bezier(0.16,1,0.3,1)",
-          transform: hovered ? "translateY(-4px)" : "translateY(0)",
-          boxShadow: hovered ? `0 12px 40px rgba(0,0,0,0.3), 0 0 20px ${color}10` : "none",
-          minHeight: hovered ? 140 : 80,
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: hovered ? 12 : 0 }}>
-          <div style={{
-            width: 44, height: 44, minWidth: 44, borderRadius: 12,
-            background: `${color}12`, display: "flex", alignItems: "center", justifyContent: "center",
-            transition: "transform 0.3s", transform: hovered ? "scale(1.1)" : "scale(1)",
-          }}>{IconComp && <IconComp size={22} color={color} />}</div>
-          <h4 style={{ fontSize: 15, fontWeight: 700, fontFamily: "'Outfit', sans-serif" }}>{title}</h4>
-        </div>
-        <div style={{
-          overflow: "hidden", maxHeight: hovered ? 100 : 0,
-          opacity: hovered ? 1 : 0,
-          transition: "max-height 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease",
-        }}>
-          <p style={{ fontSize: 13, color: C.textSec, lineHeight: 1.7, paddingLeft: 58, fontFamily: "'Space Grotesk', sans-serif" }}>{desc}</p>
-        </div>
-      </div>
-    </ScrollReveal>
-  );
-};
-
-
-/* ═══════════════════════════════════════
-   MAIN APP
-   ═══════════════════════════════════════ */
-function PartnerProgram() {
-  const [activeTier, setActiveTier] = useState(2); // Gold default
-  const [heroLoaded, setHeroLoaded] = useState(false);
-
-  useEffect(() => {
-    analytics.init();
-    setTimeout(() => setHeroLoaded(true), 200);
-  }, []);
-
-  const tiers = [
-    { name: "Bronze", color: "#cd7f32", rate: 7, users: "Up to 200", ex: "200 users \u00D7 3 lots avg", val: "$4,200 /mo", highlight: false },
-    { name: "Silver", color: "#c0c0c0", rate: 8, users: "Up to 500", ex: "500 users \u00D7 3 lots avg", val: "$12,000 /mo", highlight: false },
-    { name: "Gold", color: "#ffc44d", rate: 9, users: "Up to 1,000", ex: "1,000 users \u00D7 3 lots avg", val: "$27,000 /mo", highlight: true },
-    { name: "Diamond", color: "#b9f2ff", rate: 10, users: "Up to 1,500", ex: "1,500 users \u00D7 3 lots avg", val: "$45,000 /mo", highlight: false },
-    { name: "Platinum", color: "#e5e4e2", rate: 12, users: "1,500+", ex: "2,000 users \u00D7 3 lots avg", val: "$72,000 /mo", highlight: false },
-  ];
-
-  return (
-    <div style={{ background: C.bg, color: C.text, minHeight: "100vh", fontFamily: "'Space Grotesk', sans-serif" }}>
-      <style>{`
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
-        ::selection { background: ${C.accent}40; }
-
-        @keyframes blink { 0%,100% { opacity:1 } 50% { opacity:0 } }
-        @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:.5 } }
-        @keyframes glow { 0%,100% { box-shadow: 0 0 20px ${C.accent}30 } 50% { box-shadow: 0 0 50px ${C.accent}50 } }
-        @keyframes glowPulse { 0%,100% { box-shadow: 0 4px 24px ${C.accent}30 } 50% { box-shadow: 0 4px 48px ${C.accent}60 } }
-        @keyframes ticker { 0% { transform:translateX(0) } 100% { transform:translateX(-50%) } }
-        @keyframes float { 0%,100% { transform:translateY(0) } 50% { transform:translateY(-12px) } }
-        @keyframes gradientBorder {
-          0% { background-position: 0% 50% }
-          50% { background-position: 100% 50% }
-          100% { background-position: 0% 50% }
-        }
-        @keyframes confetti {
-          0% { opacity:1; transform:translate(0,0) rotate(0deg) }
-          100% { opacity:0; transform:translate(var(--cx),var(--cy)) rotate(var(--cr)) }
-        }
-        @font-face {
-          font-family: 'Cardot';
-          src: url('cardot/CARDOT.ttf') format('truetype');
-          font-weight: 400;
-          font-style: normal;
-        }
-        @font-face {
-          font-family: 'Cardot';
-          src: url('cardot/CARDOT-Semibold.ttf') format('truetype');
-          font-weight: 600;
-          font-style: normal;
-        }
-
-        @keyframes orbFloat1 { 0%,100% { transform:translate(0,0) } 50% { transform:translate(30px,-20px) } }
-        @keyframes orbFloat2 { 0%,100% { transform:translate(0,0) } 50% { transform:translate(-20px,30px) } }
-        @keyframes orbFloat3 { 0%,100% { transform:translate(0,0) } 50% { transform:translate(15px,20px) } }
-
-        .orb-1 { animation: orbFloat1 12s ease-in-out infinite; }
-        .orb-2 { animation: orbFloat2 15s ease-in-out infinite; }
-        .orb-3 { animation: orbFloat3 18s ease-in-out infinite; }
-
-        .custom-slider {
-          -webkit-appearance: none; appearance: none;
-          height: 4px; border-radius: 2px;
-          background: ${C.border}; outline: none;
-          position: relative; z-index: 2;
-        }
-        .custom-slider::-webkit-slider-thumb {
-          -webkit-appearance: none; appearance: none;
-          width: 20px; height: 20px; border-radius: 50%;
-          background: ${C.accent}; cursor: pointer;
-          box-shadow: 0 0 16px ${C.accent}60, 0 0 4px ${C.accent};
-          border: 2px solid ${C.bg};
-          transition: transform 0.2s;
-        }
-        .custom-slider::-webkit-slider-thumb:hover {
-          transform: scale(1.2);
-        }
-        .custom-slider::-moz-range-thumb {
-          width: 20px; height: 20px; border-radius: 50%;
-          background: ${C.accent}; cursor: pointer;
-          box-shadow: 0 0 16px ${C.accent}60, 0 0 4px ${C.accent};
-          border: 2px solid ${C.bg};
-        }
-
-        .cta-btn { transition: all .3s; cursor: pointer; text-decoration: none; }
-        .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 40px ${C.accent}50 !important; }
-
-        .gradient-border-card {
-          position: relative;
-          background: ${C.surface};
-          border-radius: 18px;
-          overflow: hidden;
-        }
-        .gradient-border-card::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          border-radius: 18px;
-          padding: 1px;
-          background: linear-gradient(135deg, ${C.accent}, ${C.blue}, ${C.purple}, ${C.accent});
-          background-size: 300% 300%;
-          animation: gradientBorder 4s ease infinite;
-          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          -webkit-mask-composite: xor;
-          mask-composite: exclude;
-        }
-
-        *::-webkit-scrollbar { width: 4px; }
-        *::-webkit-scrollbar-track { background: transparent; }
-        *::-webkit-scrollbar-thumb { background: ${C.border}; border-radius: 4px; }
-
-        @media (max-width: 768px) {
-          .tier-grid { grid-template-columns: 1fr 1fr !important; }
-          .tier-grid > div:last-child { grid-column: 1 / -1; }
-          .calc-grid-row { grid-template-columns: 1fr !important; }
-          .calc-result-row { grid-template-columns: 1fr !important; text-align: center; }
-          .benefit-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
-          .steps-row { flex-direction: column !important; gap: 14px !important; }
-          .steps-row > div { flex: none !important; width: 100% !important; }
-          .nav-inner { padding: 0 16px !important; }
-          .final-cta { padding: 32px 20px !important; }
-          .final-cta h2 { font-size: 22px !important; }
-          .section-heading { font-size: 24px !important; }
-        }
-        @media (max-width: 480px) {
-          .benefit-grid { grid-template-columns: 1fr !important; gap: 10px !important; }
-          .steps-row > div { min-height: auto !important; padding: 24px 20px !important; }
-          .section-heading { font-size: 22px !important; }
-          .final-cta-wrap { max-width: 100% !important; }
-          .final-cta { padding: 28px 16px !important; border-radius: 16px !important; }
-          .final-cta h2 { font-size: 20px !important; }
-          .hero-heading { font-size: 32px !important; }
-        }
-      `}</style>
-
-      <GradientOrbs />
-
-      {/* ─── Nav ─── */}
-      <nav style={{
-        position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-        background: `${C.bg}E8`, backdropFilter: "blur(20px)",
-        borderBottom: `1px solid ${C.border}`,
-      }}>
-        <div className="nav-inner" style={{
-          maxWidth: 1000, margin: "0 auto", padding: "0 24px",
-          display: "flex", justifyContent: "space-between", alignItems: "center", height: 60,
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <img src="darkmode logo.png" alt="MarketScore" style={{ height: 36, objectFit: "contain" }} />
-            <div style={{ display: "flex", flexDirection: "column", lineHeight: 1, gap: 1 }}>
-              <span style={{ fontWeight: 600, fontSize: 16, fontFamily: "'Cardot', sans-serif", letterSpacing: 1, color: C.text }}>Market</span>
-              <span style={{ fontWeight: 600, fontSize: 16, fontFamily: "'Cardot', sans-serif", letterSpacing: 1, color: C.accent }}>Score</span>
-            </div>
-          </div>
-          <a href="#apply" className="cta-btn" style={{
-            background: C.accent, color: "#000", padding: "9px 22px",
-            borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: "none",
-            display: "flex", alignItems: "center", gap: 8,
-            fontFamily: "'Space Grotesk', sans-serif",
-          }}>Apply Now</a>
-        </div>
-      </nav>
-
-      {/* ═══ 1. CANVAS HERO ═══ */}
-      <section style={{ position: "relative", minHeight: "100vh", display: "flex", alignItems: "center", overflow: "hidden" }}>
-        <ParticleCanvas />
-        <div style={{
-          position: "relative", zIndex: 1, maxWidth: 1000, margin: "0 auto",
-          padding: "120px 24px 60px", textAlign: "center", width: "100%",
-        }}>
-          <div style={{
-            opacity: heroLoaded ? 1 : 0, transform: heroLoaded ? "translateY(0)" : "translateY(20px)",
-            transition: "all 0.8s cubic-bezier(0.16,1,0.3,1)",
-          }}>
-            <div style={{
-              display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 18px",
-              borderRadius: 100, background: `${C.accent}10`, border: `1px solid ${C.accent}25`,
-              marginBottom: 32,
-            }}>
-              <span style={{ width: 6, height: 6, borderRadius: 3, background: C.accent, animation: "pulse 2s infinite" }} />
-              <span style={{
-                fontSize: 11, fontWeight: 700, color: C.accent, letterSpacing: 2,
-                textTransform: "uppercase", fontFamily: "'JetBrains Mono', monospace",
-              }}>
-                Partner Program — Now Open
-              </span>
-            </div>
-          </div>
-
-          <h1 className="hero-heading" style={{
-            fontSize: "clamp(36px, 7vw, 72px)", fontWeight: 900, lineHeight: 1.05,
-            letterSpacing: -3, marginBottom: 24,
-            fontFamily: "'Outfit', sans-serif",
-            opacity: heroLoaded ? 1 : 0, transform: heroLoaded ? "translateY(0)" : "translateY(30px)",
-            transition: "all 0.8s cubic-bezier(0.16,1,0.3,1) 0.15s",
-          }}>
-            <Typewriter text="Your Users Trade." speed={60} delay={600} />
-            <br />
-            <span style={{
-              background: `linear-gradient(135deg, ${C.accent}, #00b4d8, ${C.purple})`,
-              backgroundSize: "200% 200%",
-              animation: "gradientBorder 4s ease infinite",
-              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-            }}>
-              <Typewriter text="You Earn Per Lot." speed={60} delay={1800} />
-            </span>
-          </h1>
-
-          <p style={{
-            fontSize: "clamp(16px, 2.2vw, 20px)", color: C.textSec, maxWidth: 580,
-            margin: "0 auto", lineHeight: 1.7, fontFamily: "'Space Grotesk', sans-serif",
-            opacity: heroLoaded ? 1 : 0, transform: heroLoaded ? "translateY(0)" : "translateY(30px)",
-            transition: "all 0.8s cubic-bezier(0.16,1,0.3,1) 0.4s",
-          }}>
-            Refer traders to MarketScore. Every lot they trade earns you up to{" "}
-            <strong style={{ color: C.accent, fontSize: "1.1em", fontFamily: "'JetBrains Mono', monospace" }}>
-              {heroLoaded && <AnimatedCounter end={12} prefix="$" suffix="/lot" duration={2000} />}
-            </strong>
-          </p>
-
-          <div style={{
-            marginTop: 40,
-            opacity: heroLoaded ? 1 : 0, transform: heroLoaded ? "translateY(0)" : "translateY(30px)",
-            transition: "all 0.8s cubic-bezier(0.16,1,0.3,1) 0.6s",
-          }}>
-            <a href="#tiers" className="cta-btn" style={{
-              display: "inline-flex", alignItems: "center", gap: 10,
-              background: C.accent, color: "#000", padding: "16px 36px",
-              borderRadius: 14, fontWeight: 700, fontSize: 16, textDecoration: "none",
-              boxShadow: `0 4px 24px ${C.accent}30`,
-              animation: "glowPulse 3s ease-in-out infinite",
-              fontFamily: "'Space Grotesk', sans-serif",
-            }}>
-              See Earning Tiers <IconArrowDown size={18} color="#000" style={{ marginLeft: 2 }} />
-            </a>
-          </div>
-
-          <div style={{
-            position: "absolute", bottom: 40, left: "50%", transform: "translateX(-50%)",
-            display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
-            opacity: heroLoaded ? 1 : 0,
-            transition: "opacity 1s ease 1.5s",
-          }}>
-            <div style={{
-              width: 1, height: 40,
-              background: `linear-gradient(to bottom, ${C.accent}, transparent)`,
-              animation: "pulse 2s infinite",
-            }} />
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ 2. STATS TICKER ═══ */}
-      <StatsTicker />
-
-      {/* ═══ 3. HOW IT WORKS ═══ */}
-      <section style={{ padding: "80px 0" }}>
-        <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 24px" }}>
-          <ScrollReveal>
-            <div style={{
-              fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: 3,
-              textTransform: "uppercase", color: C.accent, marginBottom: 12, textAlign: "center",
-            }}>How It Works</div>
-            <h2 className="section-heading" style={{
-              textAlign: "center", fontSize: 32, fontWeight: 800, marginBottom: 48,
-              letterSpacing: -1, fontFamily: "'Outfit', sans-serif",
-            }}>
-              Three steps. Recurring income.
-            </h2>
-          </ScrollReveal>
-          <div className="steps-row" style={{ display: "flex", gap: 20 }}>
-            {[
-              { n: "01", title: "Get Your Code", desc: "Sign up as a MarketScore partner. You get a unique referral code (e.g. MS-JOHN) and a branded signup link.", color: C.accent, StepIcon: IconCode },
-              { n: "02", title: "Bring Users In", desc: "Share your code through posts, stories, reels \u2014 your style. Users sign up on MarketScore with your code.", color: C.blue, StepIcon: IconUsers },
-              { n: "03", title: "Earn Every Lot", desc: "Every lot your referred users trade earns you commission. Real-time tracking on your partner dashboard.", color: C.gold, StepIcon: IconTrendingUp },
-            ].map((s, i) => (
-              <ScrollReveal key={i} delay={i * 0.15} style={{ flex: 1 }}>
-                <TiltCard style={{
-                  background: C.surface, borderRadius: 18, padding: "32px 24px",
-                  border: `1px solid ${C.border}`, textAlign: "center", minHeight: 220,
-                  height: "100%",
-                }}>
-                  <div style={{
-                    display: "flex", flexDirection: "column", alignItems: "center", gap: 8, marginBottom: 14,
-                  }}>
-                    <div style={{
-                      width: 52, height: 52, borderRadius: 14,
-                      background: `${s.color}12`, display: "flex", alignItems: "center", justifyContent: "center",
-                    }}>
-                      <s.StepIcon size={26} color={s.color} />
-                    </div>
-                    <span style={{
-                      fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: 700,
-                      color: s.color, opacity: 0.5, letterSpacing: 2,
-                    }}>{s.n}</span>
-                  </div>
-                  <h4 style={{ fontSize: 18, fontWeight: 700, marginBottom: 10, fontFamily: "'Outfit', sans-serif" }}>{s.title}</h4>
-                  <p style={{ fontSize: 14, color: C.textSec, lineHeight: 1.7, fontFamily: "'Space Grotesk', sans-serif" }}>{s.desc}</p>
-                </TiltCard>
-              </ScrollReveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ 4. KEY DIFFERENTIATOR ═══ */}
-      <section style={{ padding: "20px 0 60px" }}>
-        <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 24px" }}>
-          <ScrollReveal>
-            <div className="gradient-border-card" style={{ padding: "36px 32px", position: "relative" }}>
-              <div style={{
-                position: "absolute", top: -60, right: -60, width: 220, height: 220,
-                background: `radial-gradient(circle, ${C.accent}08, transparent 70%)`,
-                pointerEvents: "none",
-              }} />
-              <h3 style={{
-                fontSize: 20, fontWeight: 800, marginBottom: 12,
-                display: "flex", alignItems: "center", gap: 10,
-                fontFamily: "'Outfit', sans-serif",
-              }}>
-                <IconTarget size={22} color={C.accent} style={{ marginRight: 4 }} /> Why User Count, Not Followers
-              </h3>
-              <p style={{ fontSize: 15, color: C.textSec, lineHeight: 1.8, fontFamily: "'Space Grotesk', sans-serif" }}>
-                We don't care if you have 10K or 500K followers. Your tier is based on{" "}
-                <strong style={{ color: C.text }}>active referred users trading on MarketScore</strong>.
-                Bring 200 real traders and you're already earning $7/lot. This means{" "}
-                <strong style={{ color: C.text }}>micro-influencers with engaged audiences earn more</strong>{" "}
-                than large accounts with dead followers. Performance wins.
-              </p>
-            </div>
-          </ScrollReveal>
-        </div>
-      </section>
-
-      {/* ═══ 5. COMMISSION TIERS ═══ */}
-      <section id="tiers" style={{ padding: "60px 0" }}>
-        <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 24px" }}>
-          <ScrollReveal>
-            <div style={{
-              fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: 3,
-              textTransform: "uppercase", color: C.accent, marginBottom: 12, textAlign: "center",
-            }}>Commission Tiers</div>
-            <h2 className="section-heading" style={{
-              textAlign: "center", fontSize: 32, fontWeight: 800, marginBottom: 48,
-              letterSpacing: -1, fontFamily: "'Outfit', sans-serif",
-            }}>
-              More users = higher rate per lot.
-            </h2>
-          </ScrollReveal>
-
-          <div className="tier-grid" style={{
-            display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 16,
-          }}>
-            {tiers.map((t, i) => (
-              <ScrollReveal key={i} delay={i * 0.1}>
-                <TiltCard
-                  className="tier-card"
-                  style={{
-                    background: activeTier === i
-                      ? `linear-gradient(160deg, ${C.surface} 40%, ${C.accent}0A 100%)`
-                      : C.surface,
-                    borderRadius: 18, padding: "28px 20px",
-                    border: `1px solid ${activeTier === i ? C.accent + "35" : C.border}`,
-                    cursor: "pointer",
-                    opacity: activeTier === i ? 1 : 0.7,
-                    transition: "opacity 0.3s, border-color 0.3s",
-                    boxShadow: activeTier === i ? `0 0 30px ${C.accent}10` : "none",
-                    height: "100%",
-                  }}
-                >
-                  <div onClick={() => setActiveTier(i)} style={{ position: "relative", zIndex: 2 }}>
-                    <div style={{
-                      marginBottom: 14,
-                      animation: activeTier === i ? "float 3s ease-in-out infinite" : "none",
-                    }}>{(() => { const TierIcon = TIER_ICONS[t.name]; return TierIcon ? <TierIcon size={36} color={t.color} /> : null; })()}</div>
-                    <div style={{
-                      fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: 1.5,
-                      textTransform: "uppercase", fontWeight: 600, color: t.color, marginBottom: 14,
-                    }}>{t.name}</div>
-                    <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 6 }}>
-                      <span style={{
-                        fontSize: 42, fontWeight: 900, letterSpacing: -2,
-                        fontFamily: "'Outfit', sans-serif",
-                        background: `linear-gradient(135deg, ${C.accent}, #00b4d8)`,
-                        WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                      }}>${t.rate}</span>
-                      <span style={{ fontSize: 14, color: C.textMuted }}>/ lot</span>
-                    </div>
-                    <div style={{ fontSize: 13, color: C.textSec, marginBottom: 18, lineHeight: 1.4 }}>
-                      <strong style={{ color: C.text }}>{t.users}</strong> referred users
-                    </div>
-                    <div style={{
-                      background: C.bg, borderRadius: 10, padding: "12px 14px",
-                      fontFamily: "'JetBrains Mono', monospace", fontSize: 11,
-                      overflow: "hidden",
-                      maxHeight: activeTier === i ? 80 : 0,
-                      opacity: activeTier === i ? 1 : 0,
-                      transition: "max-height 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.3s",
-                    }}>
-                      <div style={{ color: C.textMuted, marginBottom: 3 }}>{t.ex}</div>
-                      <div style={{ color: C.gold, fontWeight: 700, fontSize: 15 }}>{t.val}</div>
-                    </div>
-                  </div>
-                </TiltCard>
-              </ScrollReveal>
-            ))}
-          </div>
-
-          {/* ═══ 6. EARNINGS CALCULATOR ═══ */}
-          <EarningsCalculator />
-        </div>
-      </section>
-
-      {/* ═══ 7. WHAT PARTNERS GET ═══ */}
-      <section style={{ padding: "60px 0" }}>
-        <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 24px" }}>
-          <ScrollReveal>
-            <div style={{
-              fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: 3,
-              textTransform: "uppercase", color: C.accent, marginBottom: 12, textAlign: "center",
-            }}>What You Get</div>
-            <h2 className="section-heading" style={{
-              textAlign: "center", fontSize: 32, fontWeight: 800, marginBottom: 48,
-              letterSpacing: -1, fontFamily: "'Outfit', sans-serif",
-            }}>
-              We handle the product. You handle the reach.
-            </h2>
-          </ScrollReveal>
-          <div className="benefit-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-            {[
-              { IconComp: IconRadar, title: "AI Signals for Your Users", desc: "Your audience gets MarketScore's AI-powered trading signals \u2014 institutional-grade setups, delivered daily.", color: C.accent },
-              { IconComp: IconBarChart, title: "Real-Time Partner Dashboard", desc: "Track sign-ups, active traders, lots traded, and your earnings. Updated live. Transparent.", color: C.purple },
-              { IconComp: IconPalette, title: "Branded Content Assets", desc: "Ready-to-post stories, reels, and carousels. Designed for engagement. Just post and tag.", color: C.gold },
-              { IconComp: IconShield, title: "Quality & Compliance", desc: "We maintain signal accuracy, platform uptime, and compliance \u2014 your reputation stays clean.", color: C.accent },
-              { IconComp: IconHandshake, title: "User Onboarding Support", desc: "We handle your users' questions, setup, and activation. You bring them in \u2014 we keep them trading.", color: C.purple },
-              { IconComp: IconZap, title: "Monthly Payouts, Zero Fees", desc: "Settled on the 5th of every month. Bank or crypto. Full transparency. No deductions.", color: C.gold },
-            ].map((b, i) => (
-              <BenefitCard key={i} {...b} delay={i * 0.08} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ 8. CTA — MAGNETIC BUTTON ═══ */}
-      <section id="apply" style={{ padding: "60px 0 100px" }}>
-        <div className="final-cta-wrap" style={{ maxWidth: 560, margin: "0 auto", padding: "0 24px" }}>
-          <ScrollReveal>
-            <div className="final-cta" style={{
-              borderRadius: 24, padding: "52px 36px", textAlign: "center",
-              background: `linear-gradient(135deg, ${C.surface}, ${C.card})`,
-              border: `1px solid ${C.accent}20`, position: "relative", overflow: "hidden",
-            }}>
-              <div style={{
-                position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)",
-                width: 400, height: 400, borderRadius: "50%",
-                background: `radial-gradient(circle, ${C.accent}08 0%, transparent 60%)`,
-                pointerEvents: "none",
-              }} />
-              <div style={{ position: "relative", zIndex: 1 }}>
-                <h2 style={{
-                  fontSize: 32, fontWeight: 900, letterSpacing: -1.5, lineHeight: 1.15,
-                  fontFamily: "'Outfit', sans-serif",
-                }}>
-                  Ready to earn?
-                </h2>
-                <p style={{
-                  fontSize: 15, color: C.textSec, marginTop: 14, maxWidth: 440,
-                  margin: "14px auto 0", lineHeight: 1.7, fontFamily: "'Space Grotesk', sans-serif",
-                }}>
-                  No follower minimums. No upfront cost. Just bring traders and earn on every lot they trade.
-                </p>
-                <div style={{ marginTop: 28 }}>
-                  <MagneticButton
-                    href={WA_LINK}
-                    onClick={() => analytics.track("wa_click", { loc: "partner_cta" })}
-                    style={{
-                      background: C.accent, color: "#000", padding: "17px 40px",
-                      borderRadius: 14, fontWeight: 800, fontSize: 17, textDecoration: "none",
-                      boxShadow: `0 4px 24px ${C.accent}30`,
-                      animation: "glowPulse 3s ease-in-out infinite",
-                      fontFamily: "'Space Grotesk', sans-serif",
-                    }}
-                  >
-                    Apply for Partnership <IconArrowRight size={18} color="#000" style={{ marginLeft: 2 }} />
-                  </MagneticButton>
-                </div>
-                <div style={{ marginTop: 18, display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
-                  {["No follower minimum", "Real-time dashboard", "Monthly payouts"].map((t, i) => (
-                    <span key={i} style={{
-                      fontSize: 11, color: C.textMuted, fontFamily: "'Space Grotesk', sans-serif",
-                    }}><IconCheck size={13} color={C.accent} style={{ marginRight: 3 }} /> {t}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </ScrollReveal>
-        </div>
-      </section>
-
-      <footer style={{ borderTop: `1px solid ${C.border}`, padding: "18px 0" }}>
-        <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
-          <p style={{ fontSize: 10, color: C.textMuted, lineHeight: 1.5, fontFamily: "'Space Grotesk', sans-serif" }}>
-            <span style={{ color: C.accent, fontWeight: 600, fontFamily: "'Cardot', sans-serif" }}>MarketScore</span> — Partner Program &copy; 2026
-          </p>
-        </div>
-      </footer>
-    </div>
-  );
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MarketScore — Partner Dashboard</title>
+<link rel="icon" type="image/png" href="App Icon.png" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #05080F;
+  --bg2: #080D18;
+  --surface: #0D1424;
+  --card: #111A2E;
+  --card-hover: #142036;
+  --border: rgba(255,255,255,0.06);
+  --border-h: rgba(255,255,255,0.12);
+  --green: #00E5A0;
+  --green-glow: rgba(0,229,160,0.15);
+  --green-dim: rgba(0,229,160,0.06);
+  --red: #FF4D6A;
+  --red-dim: rgba(255,77,106,0.08);
+  --gold: #FFB830;
+  --gold-dim: rgba(255,184,48,0.08);
+  --blue: #4DA6FF;
+  --blue-dim: rgba(77,166,255,0.08);
+  --purple: #A78BFA;
+  --purple-dim: rgba(167,139,250,0.08);
+  --text: #F0F4F8;
+  --text2: #A0B4CC;
+  --text3: #5A7090;
+  --bronze: #cd7f32;
+  --silver: #c0c0c0;
+  --diamond: #b9f2ff;
+  --plat: #e5e4e2;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<PartnerProgram />);
-  </script>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+.mono { font-family: 'JetBrains Mono', monospace; }
+.display { font-family: 'Outfit', sans-serif; }
+
+/* Animated background grid */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,229,160,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,160,0.015) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Layout */
+.layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+    z-index: 200;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .sidebar-mobile { display: flex !important; }
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 150;
+  }
+  .sidebar-overlay.open { display: block; }
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 240px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+  overflow-y: auto;
+}
+
+.sidebar-mobile {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  z-index: 50;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  backdrop-filter: blur(20px);
+}
+
+.sb-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.sb-logo img {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.sb-logo span {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: -0.5px;
+}
+
+.sb-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+
+.sb-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.sb-item:hover {
+  color: var(--text2);
+  background: rgba(255,255,255,0.03);
+}
+
+.sb-item.active {
+  color: var(--green);
+  background: var(--green-dim);
+  border-color: rgba(0,229,160,0.1);
+}
+
+.sb-item .icon { font-size: 16px; width: 20px; text-align: center; }
+
+.sb-user {
+  margin-top: auto;
+  padding: 14px 12px;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.sb-user-name { font-weight: 600; font-size: 13px; margin-bottom: 2px; }
+.sb-user-email { font-size: 11px; color: var(--text3); }
+.sb-user-tier {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(192,192,192,0.08);
+  color: var(--silver);
+}
+
+/* Main content */
+.main {
+  grid-column: 2;
+  padding: 28px 32px 60px;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 900px) {
+  .main {
+    grid-column: 1;
+    padding: 80px 16px 60px;
+  }
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.header h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.header-right { display: flex; align-items: center; gap: 10px; }
+
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  background: var(--green-dim);
+  border: 1px solid rgba(0,229,160,0.15);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--green);
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(0,229,160,0.05); }
+  50% { box-shadow: 0 0 40px rgba(0,229,160,0.12); }
+}
+
+/* Referral Card */
+.ref-card {
+  background: linear-gradient(135deg, var(--surface), rgba(0,229,160,0.03));
+  border: 1px solid rgba(0,229,160,0.15);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  animation: glowPulse 4s ease-in-out infinite;
+}
+
+.ref-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
+
+.ref-code {
+  font-family: 'Outfit', sans-serif;
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  background: linear-gradient(135deg, var(--green), #00b4d8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ref-link {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 4px;
+}
+
+.ref-link b { color: var(--text2); font-weight: 600; }
+
+.ref-btns { display: flex; gap: 8px; }
+
+.btn {
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s;
+}
+
+.btn-primary {
+  background: var(--green);
+  color: var(--bg);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(0,229,160,0.25);
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: var(--border-h);
+}
+
+/* Tier progress */
+.tier-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  transition: border-color 0.3s;
+}
+
+.tier-card:hover { border-color: var(--border-h); }
+
+.tier-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px;
+  border-radius: var(--radius-xs);
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.tier-info {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+.tier-info b { color: var(--text); font-weight: 700; }
+
+.tier-progress { width: 200px; }
+
+@media (max-width: 600px) {
+  .tier-progress { width: 100%; }
+  .tier-card { flex-direction: column; align-items: flex-start; }
+  .ref-card { flex-direction: column; align-items: flex-start; }
+  .ref-code { font-size: 24px; }
+  .ref-btns { width: 100%; }
+  .ref-btns .btn { flex: 1; text-align: center; }
+  .header h1 { font-size: 22px !important; }
+  .header { flex-direction: column; align-items: flex-start; }
+  .stat-value { font-size: 24px; }
+  .payout-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .payout-right { width: 100%; justify-content: space-between; }
+  .rm-tier { flex-wrap: wrap; gap: 8px; }
+  .rm-range { width: 100%; margin-top: 2px; }
+}
+
+.tier-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
+
+.tier-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.04);
+  overflow: hidden;
+  position: relative;
+}
+
+.tier-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.tier-bar-fill::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3));
+  border-radius: 0 4px 4px 0;
+}
+
+/* Stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 700px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.stat-card:hover {
+  border-color: var(--border-h);
+  transform: translateY(-2px);
+}
+
+.stat-card:hover::before { opacity: 1; }
+
+.stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 10px;
+}
+
+.stat-value {
+  font-family: 'Outfit', sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 4px;
+  animation: countUp 0.6s ease-out;
+}
+
+.stat-change {
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-change.up { color: var(--green); }
+.stat-change.down { color: var(--red); }
+
+/* Section headers */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.tab-group { display: flex; gap: 4px; }
+
+.tab {
+  padding: 6px 14px;
+  border-radius: var(--radius-xs);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  font-family: 'Space Grotesk', sans-serif;
+  transition: all 0.2s;
+}
+
+.tab.active {
+  background: rgba(255,255,255,0.07);
+  color: var(--text);
+}
+
+.tab:hover:not(.active) {
+  color: var(--text2);
+}
+
+/* Chart */
+.chart-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.chart-card:hover { border-color: var(--border-h); }
+
+/* Table */
+.table-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 24px;
+  transition: border-color 0.3s;
+}
+
+.table-card:hover { border-color: var(--border-h); }
+
+.tbl-header, .tbl-row {
+  display: grid;
+  grid-template-columns: 2.4fr 1fr 1fr 1.2fr 0.8fr;
+  gap: 8px;
+  padding: 14px 24px;
+  font-size: 13px;
+  align-items: center;
+}
+
+@media (max-width: 700px) {
+  .tbl-header, .tbl-row {
+    grid-template-columns: 1.8fr 1fr 1fr;
+    font-size: 12px;
+    padding: 12px 16px;
+  }
+  .tbl-header > *:nth-child(4),
+  .tbl-header > *:nth-child(5),
+  .tbl-row > *:nth-child(4),
+  .tbl-row > *:nth-child(5) { display: none; }
+}
+
+.tbl-header {
+  border-bottom: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+
+.tbl-row {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+
+.tbl-row:last-child { border-bottom: none; }
+.tbl-row:hover { background: rgba(255,255,255,0.015); }
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--bg);
+  flex-shrink: 0;
+}
+
+.user-name { font-weight: 600; font-size: 13px; }
+.user-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+
+.badge {
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: var(--radius-xs);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge-active { background: var(--green-dim); color: var(--green); }
+.badge-inactive { background: var(--red-dim); color: var(--red); }
+.badge-new { background: var(--blue-dim); color: var(--blue); }
+
+/* Payout rows */
+.payout-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+
+.payout-row:last-child { border-bottom: none; }
+.payout-row:hover { background: rgba(255,255,255,0.015); }
+
+.payout-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.payout-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.payout-label { font-size: 14px; font-weight: 600; }
+.payout-date { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+.payout-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.payout-amt {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.payout-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--radius-xs);
+}
+
+/* Tier Roadmap */
+.roadmap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.roadmap-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.rm-tier {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+  transition: all 0.2s;
+}
+
+.rm-tier.current {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-h);
+}
+
+.rm-tier.locked { opacity: 0.4; }
+.rm-tier.done { opacity: 0.6; }
+
+.rm-icon { font-size: 22px; width: 32px; text-align: center; }
+.rm-name { font-size: 14px; font-weight: 700; min-width: 80px; }
+.rm-rate {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+  min-width: 60px;
+}
+.rm-range { font-size: 12px; color: var(--text3); flex: 1; }
+.rm-status { margin-left: auto; font-size: 16px; }
+
+/* How it works */
+.how-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.how-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.how-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.how-step {
+  padding: 18px 16px;
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  transition: all 0.3s;
+}
+
+.how-step:hover {
+  border-color: var(--border-h);
+  transform: translateY(-2px);
+}
+
+.how-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--green);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.how-step-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.how-step-desc {
+  font-size: 12px;
+  color: var(--text3);
+  line-height: 1.5;
+}
+
+/* Two column layout for bottom */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 800px) {
+  .bottom-grid { grid-template-columns: 1fr; }
+}
+
+/* Tooltip on hover */
+.stat-card[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 10px;
+  color: var(--text2);
+  white-space: nowrap;
+  z-index: 10;
+}
+
+/* Scroll animation */
+.anim-in {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: countUp 0.5s ease-out forwards;
+}
+
+.anim-in:nth-child(1) { animation-delay: 0s; }
+.anim-in:nth-child(2) { animation-delay: 0.05s; }
+.anim-in:nth-child(3) { animation-delay: 0.1s; }
+.anim-in:nth-child(4) { animation-delay: 0.15s; }
+
+/* ─── Login Screen ─── */
+.login-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  transition: opacity 0.5s, visibility 0.5s;
+}
+
+.login-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.login-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('Broker Page BG (1).png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.login-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 7, 13, 0.4);
+}
+
+.login-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 20px;
+  background: rgba(11, 17, 32, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 20px 32px 32px;
+  animation: loginFadeIn 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+
+@keyframes loginFadeIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.login-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0;
+}
+
+.login-logo img {
+  height: 200px;
+  object-fit: contain;
+  margin: -20px 0 -20px;
+}
+
+.login-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: -0.5px;
+  margin-bottom: 2px;
+  color: var(--text);
+}
+
+.login-subtitle {
+  font-size: 13px;
+  color: var(--text3);
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.login-field {
+  margin-bottom: 12px;
+}
+
+.login-label {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 8px;
+}
+
+.login-input {
+  width: 100%;
+  padding: 13px 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.login-input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(0,229,160,0.1);
+}
+
+.login-input::placeholder {
+  color: var(--text3);
+}
+
+.login-remember {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: var(--text3);
+}
+
+.login-remember label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.login-remember input[type="checkbox"] {
+  accent-color: var(--green);
+  width: 14px;
+  height: 14px;
+}
+
+.login-remember a {
+  color: var(--green);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-remember a:hover {
+  text-decoration: underline;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--green);
+  color: var(--bg);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 30px rgba(0,229,160,0.3);
+}
+
+.login-btn:active {
+  transform: translateY(0);
+}
+
+.login-error {
+  color: var(--red);
+  font-size: 12px;
+  text-align: center;
+  margin-top: 12px;
+  min-height: 18px;
+  transition: opacity 0.3s;
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--text3);
+}
+
+.login-footer a {
+  color: var(--green);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-footer a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 32px 20px;
+    margin: 0 12px;
+    border-radius: 16px;
+  }
+  .login-title { font-size: 20px; }
+}
+
+/* ─── My Users Page ─── */
+.mu-filters {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+
+.mu-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.mu-input, .mu-select {
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+  min-width: 120px;
+}
+
+.mu-input:focus, .mu-select:focus {
+  border-color: var(--green);
+}
+
+.mu-select { cursor: pointer; }
+.mu-select option { background: var(--bg2); color: var(--text); }
+
+.mu-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--text3);
+}
+
+.mu-table-wrap {
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+}
+
+.mu-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+  font-size: 13px;
+}
+
+.mu-table thead tr {
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--border);
+}
+
+.mu-table th {
+  padding: 12px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text3);
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.mu-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  color: var(--text2);
+}
+
+.mu-table tbody tr:last-child td { border-bottom: none; }
+.mu-table tbody tr { transition: background 0.2s; }
+.mu-table tbody tr:hover { background: rgba(255,255,255,0.015); }
+
+.mu-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.mu-page-btns { display: flex; gap: 6px; }
+
+.mu-page-btn {
+  padding: 6px 12px;
+  border-radius: var(--radius-xs);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text3);
+  transition: all 0.2s;
+}
+
+.mu-page-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+}
+
+.mu-page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.mu-page-btn.mu-page-active {
+  background: var(--green);
+  color: var(--bg);
+  border-color: var(--green);
+}
+
+@media (max-width: 600px) {
+  .mu-input, .mu-select { min-width: 100%; }
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</head>
+<body>
+
+<!-- ─── Login Screen ─── -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-bg"></div>
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="Design Files/Design 1/Design_1.png" alt="MarketScore" />
+    </div>
+    <div class="login-title" id="authTitle">Partner Dashboard</div>
+    <div class="login-subtitle" id="authSubtitle">Sign in to access your partner account</div>
+
+    <!-- Sign In Form -->
+    <form onsubmit="handleLogin(event)" id="loginForm">
+      <div class="login-field">
+        <label class="login-label">Email</label>
+        <input class="login-input" type="email" id="loginEmail" placeholder="you@example.com" autocomplete="username" required />
+      </div>
+      <div class="login-field">
+        <label class="login-label">Password</label>
+        <input class="login-input" type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password" required />
+      </div>
+      <div class="login-remember">
+        <label><input type="checkbox" checked /> Remember me</label>
+        <a href="#" onclick="showForgotPassword(event)">Forgot password?</a>
+      </div>
+      <button class="login-btn" type="submit">Sign In</button>
+      <div class="login-error" id="loginError"></div>
+    </form>
+
+    <!-- Sign Up Form -->
+    <form onsubmit="handleSignUp(event)" id="signupForm" style="display:none">
+      <div class="login-field">
+        <label class="login-label">Full Name</label>
+        <input class="login-input" type="text" id="signupName" placeholder="John Doe" autocomplete="name" required />
+      </div>
+      <div class="login-field">
+        <label class="login-label">Email</label>
+        <input class="login-input" type="email" id="signupEmail" placeholder="you@example.com" autocomplete="email" required />
+      </div>
+      <div class="login-field">
+        <label class="login-label">Password</label>
+        <input class="login-input" type="password" id="signupPassword" placeholder="Min 6 characters" autocomplete="new-password" required minlength="6" />
+      </div>
+      <button class="login-btn" type="submit">Create Account</button>
+      <div class="login-error" id="signupError"></div>
+    </form>
+
+    <!-- Forgot Password Form -->
+    <form onsubmit="handleForgotPassword(event)" id="forgotForm" style="display:none">
+      <div class="login-field">
+        <label class="login-label">Email</label>
+        <input class="login-input" type="email" id="forgotEmail" placeholder="you@example.com" autocomplete="email" required />
+      </div>
+      <button class="login-btn" type="submit">Send Reset Link</button>
+      <div class="login-error" id="forgotError"></div>
+      <div id="forgotSuccess" style="color:var(--green);font-size:12px;text-align:center;margin-top:12px;min-height:18px"></div>
+    </form>
+
+    <!-- Reset Password Form (shown after clicking reset link) -->
+    <form onsubmit="handleResetPassword(event)" id="resetForm" style="display:none">
+      <div class="login-field">
+        <label class="login-label">New Password</label>
+        <input class="login-input" type="password" id="resetPassword" placeholder="Min 6 characters" autocomplete="new-password" required minlength="6" />
+      </div>
+      <div class="login-field">
+        <label class="login-label">Confirm Password</label>
+        <input class="login-input" type="password" id="resetPasswordConfirm" placeholder="Confirm new password" autocomplete="new-password" required minlength="6" />
+      </div>
+      <button class="login-btn" type="submit">Update Password</button>
+      <div class="login-error" id="resetError"></div>
+    </form>
+
+    <div class="login-footer" id="authFooter">
+      Don't have an account? <a href="#" onclick="showSignUp(event)">Sign up</a>
+    </div>
+  </div>
+</div>
+
+<div class="layout" id="dashboardLayout" style="display:none">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <img src="darkmode logo.png" alt="MarketScore" style="height:32px;width:auto;border-radius:0" />
+    </div>
+
+    <nav class="sb-nav">
+      <div class="sb-item active" onclick="switchPage('dashboard')">
+        <span class="icon">📊</span> Dashboard
+      </div>
+      <div class="sb-item" onclick="switchPage('myusers')">
+        <span class="icon">👥</span> My Users
+      </div>
+      <div class="sb-item" onclick="switchPage('payouts')">
+        <span class="icon">💰</span> Payouts
+      </div>
+      <div class="sb-item" onclick="switchPage('analytics')">
+        <span class="icon">📈</span> Analytics
+      </div>
+      <div class="sb-item" onclick="switchPage('contentkit')">
+        <span class="icon">🎨</span> Content Kit
+      </div>
+      <div class="sb-item" onclick="switchPage('settings')">
+        <span class="icon">⚙️</span> Settings
+      </div>
+    </nav>
+
+    <div class="sb-user">
+      <div class="sb-user-name">John Crypto</div>
+      <div class="sb-user-email">john@example.com</div>
+      <div class="sb-user-tier">🥈 Silver Partner</div>
+      <button onclick="handleLogout()" style="margin-top:10px;width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--radius-xs);background:rgba(255,77,106,0.06);color:var(--red);font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s">
+        Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- Mobile Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- Mobile Header -->
+  <div class="sidebar-mobile">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button onclick="toggleSidebar()" style="background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;justify-content:center">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F0F4F8" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <img src="darkmode logo.png" alt="MS" style="height:28px;object-fit:contain" />
+    </div>
+    <div class="live-badge">
+      <span class="live-dot"></span> Live
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="main">
+    <!-- ═══ DASHBOARD PAGE ═══ -->
+    <div id="page-dashboard">
+    <!-- Header -->
+    <div class="header">
+      <div>
+        <h1 class="display">Partner Dashboard</h1>
+        <p style="font-size:13px;color:var(--text3);margin-top:4px">Welcome back, John. Here's your performance overview.</p>
+      </div>
+      <div class="header-right">
+        <div class="live-badge">
+          <span class="live-dot"></span> Live Data
+        </div>
+      </div>
+    </div>
+
+    <!-- Referral Code -->
+    <div class="ref-card anim-in">
+      <div>
+        <div class="ref-label">Your Referral Code</div>
+        <div class="ref-code">MS-JOHN</div>
+        <div class="ref-link">marketscore.app/join/<b>MS-JOHN</b></div>
+      </div>
+      <div class="ref-btns">
+        <button class="btn btn-primary" onclick="copyCode()">📋 Copy Link</button>
+        <button class="btn btn-secondary">QR Code</button>
+      </div>
+    </div>
+
+    <!-- Tier Status -->
+    <div class="tier-card anim-in">
+      <div>
+        <div class="tier-badge" style="background:rgba(192,192,192,0.08);color:var(--silver)">🥈 SILVER · $8/lot</div>
+        <div class="tier-info">You have <b>347 users</b>. Reach <b>500</b> to unlock <span style="color:var(--gold)">Gold</span> at <b>$9/lot</b>.</div>
+      </div>
+      <div class="tier-progress">
+        <div class="tier-bar-labels"><span>347</span><span>500</span></div>
+        <div class="tier-bar">
+          <div class="tier-bar-fill" style="width:69%;background:linear-gradient(90deg,var(--silver),#e8e8e8)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card anim-in" style="--delay:0s">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),transparent);opacity:0.5"></div>
+        <div class="stat-label">Total Users</div>
+        <div class="stat-value">347</div>
+        <div class="stat-change up">↑ 23 this week</div>
+      </div>
+      <div class="stat-card anim-in">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),transparent);opacity:0.5"></div>
+        <div class="stat-label">Active Traders</div>
+        <div class="stat-value">261</div>
+        <div class="stat-change up">↑ 75% active</div>
+      </div>
+      <div class="stat-card anim-in">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),transparent);opacity:0.5"></div>
+        <div class="stat-label">Total Lots</div>
+        <div class="stat-value" style="color:var(--green)">5,832</div>
+        <div class="stat-change up">↑ 14% vs last month</div>
+      </div>
+      <div class="stat-card anim-in">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),transparent);opacity:0.5"></div>
+        <div class="stat-label">Your Earnings</div>
+        <div class="stat-value" style="color:var(--gold)">$46,656</div>
+        <div class="stat-change up">↑ $4,120 this month</div>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="section-header">
+      <div class="section-title display">Earnings Over Time</div>
+      <div class="tab-group">
+        <button class="tab active" onclick="setTab(this)">7D</button>
+        <button class="tab" onclick="setTab(this)">30D</button>
+        <button class="tab" onclick="setTab(this)">90D</button>
+        <button class="tab" onclick="setTab(this)">ALL</button>
+      </div>
+    </div>
+    <div class="chart-card">
+      <svg viewBox="0 0 800 180" style="width:100%;height:180px" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="rgba(0,229,160,0.2)"/>
+            <stop offset="100%" stop-color="rgba(0,229,160,0)"/>
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <line x1="0" y1="45" x2="800" y2="45" stroke="rgba(255,255,255,0.02)"/>
+        <line x1="0" y1="90" x2="800" y2="90" stroke="rgba(255,255,255,0.02)"/>
+        <line x1="0" y1="135" x2="800" y2="135" stroke="rgba(255,255,255,0.02)"/>
+        <path d="M0,150 C60,148 120,140 180,130 C240,120 280,125 340,110 C400,95 440,100 500,80 C560,60 600,70 660,45 C720,25 760,30 800,15 L800,180 L0,180 Z" fill="url(#cg)"/>
+        <path d="M0,150 C60,148 120,140 180,130 C240,120 280,125 340,110 C400,95 440,100 500,80 C560,60 600,70 660,45 C720,25 760,30 800,15" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" filter="url(#glow)"/>
+        <circle cx="800" cy="15" r="5" fill="var(--green)"/>
+        <circle cx="800" cy="15" r="10" fill="none" stroke="var(--green)" stroke-width="1.5" opacity="0.3">
+          <animate attributeName="r" values="8;14;8" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <text x="8" y="172" fill="#5A7090" font-size="11" font-family="JetBrains Mono, monospace">Apr 5</text>
+        <text x="235" y="172" fill="#5A7090" font-size="11" font-family="JetBrains Mono, monospace">Apr 7</text>
+        <text x="485" y="172" fill="#5A7090" font-size="11" font-family="JetBrains Mono, monospace">Apr 9</text>
+        <text x="740" y="172" fill="#00E5A0" font-size="11" font-family="JetBrains Mono, monospace" font-weight="600">Today</text>
+      </svg>
+    </div>
+
+    <!-- Tier Roadmap -->
+    <div class="roadmap anim-in">
+      <div class="roadmap-title display">Your Tier Roadmap</div>
+      <div class="rm-tier done">
+        <div class="rm-icon">🥉</div>
+        <div class="rm-name" style="color:var(--bronze)">Bronze</div>
+        <div class="rm-rate">$7/lot</div>
+        <div class="rm-range">Up to 200 users</div>
+        <div class="rm-status">✅</div>
+      </div>
+      <div class="rm-tier current">
+        <div class="rm-icon">🥈</div>
+        <div class="rm-name" style="color:var(--silver)">Silver</div>
+        <div class="rm-rate">$8/lot</div>
+        <div class="rm-range">Up to 500 users · <b style="color:var(--text)">347 / 500</b></div>
+        <div class="rm-status">⬅️</div>
+      </div>
+      <div class="rm-tier locked">
+        <div class="rm-icon">🥇</div>
+        <div class="rm-name" style="color:var(--gold)">Gold</div>
+        <div class="rm-rate">$9/lot</div>
+        <div class="rm-range">Up to 1,000 users</div>
+        <div class="rm-status">🔒</div>
+      </div>
+      <div class="rm-tier locked">
+        <div class="rm-icon">💎</div>
+        <div class="rm-name" style="color:var(--diamond)">Diamond</div>
+        <div class="rm-rate">$10/lot</div>
+        <div class="rm-range">Up to 1,500 users</div>
+        <div class="rm-status">🔒</div>
+      </div>
+      <div class="rm-tier locked">
+        <div class="rm-icon">👑</div>
+        <div class="rm-name" style="color:var(--plat)">Platinum</div>
+        <div class="rm-rate">$12/lot</div>
+        <div class="rm-range">1,500+ users</div>
+        <div class="rm-status">🔒</div>
+      </div>
+    </div>
+
+    <!-- Referred Users Table -->
+    <div class="section-header">
+      <div class="section-title display">Your Referred Users</div>
+      <div class="tab-group">
+        <button class="tab active" onclick="setTab(this)">All</button>
+        <button class="tab" onclick="setTab(this)">Active</button>
+        <button class="tab" onclick="setTab(this)">Inactive</button>
+      </div>
+    </div>
+    <div class="table-card">
+      <div class="tbl-header">
+        <div>User</div><div>Status</div><div>Lots</div><div>Your Earn</div><div>Joined</div>
+      </div>
+      <div class="tbl-row">
+        <div class="user-cell">
+          <div class="user-avatar" style="background:linear-gradient(135deg,var(--green),#00b4d8)">01</div>
+          <div><div class="user-name">User #MS-J-0001</div><div class="user-sub">Forex · Gold</div></div>
+        </div>
+        <div><span class="badge badge-active">Active</span></div>
+        <div style="font-weight:600">342</div>
+        <div style="color:var(--green);font-weight:700" class="mono">$2,736</div>
+        <div style="color:var(--text3);font-size:12px">Mar 2</div>
+      </div>
+      <div class="tbl-row">
+        <div class="user-cell">
+          <div class="user-avatar" style="background:linear-gradient(135deg,var(--gold),#ff8844)">02</div>
+          <div><div class="user-name">User #MS-J-0002</div><div class="user-sub">Indices · Forex</div></div>
+        </div>
+        <div><span class="badge badge-active">Active</span></div>
+        <div style="font-weight:600">518</div>
+        <div style="color:var(--green);font-weight:700" class="mono">$4,144</div>
+        <div style="color:var(--text3);font-size:12px">Mar 8</div>
+      </div>
+      <div class="tbl-row">
+        <div class="user-cell">
+          <div class="user-avatar" style="background:linear-gradient(135deg,var(--purple),#6366f1)">03</div>
+          <div><div class="user-name">User #MS-J-0003</div><div class="user-sub">Gold</div></div>
+        </div>
+        <div><span class="badge badge-new">New</span></div>
+        <div style="font-weight:600">27</div>
+        <div style="color:var(--green);font-weight:700" class="mono">$216</div>
+        <div style="color:var(--text3);font-size:12px">Apr 9</div>
+      </div>
+      <div class="tbl-row">
+        <div class="user-cell">
+          <div class="user-avatar" style="background:linear-gradient(135deg,var(--red),#ff8888)">04</div>
+          <div><div class="user-name">User #MS-J-0004</div><div class="user-sub">Crypto · Forex</div></div>
+        </div>
+        <div><span class="badge badge-inactive">Inactive</span></div>
+        <div style="font-weight:600">84</div>
+        <div style="color:var(--green);font-weight:700" class="mono">$672</div>
+        <div style="color:var(--text3);font-size:12px">Feb 19</div>
+      </div>
+      <div class="tbl-row">
+        <div class="user-cell">
+          <div class="user-avatar" style="background:linear-gradient(135deg,var(--blue),#3b82f6)">05</div>
+          <div><div class="user-name">User #MS-J-0005</div><div class="user-sub">Forex</div></div>
+        </div>
+        <div><span class="badge badge-active">Active</span></div>
+        <div style="font-weight:600">203</div>
+        <div style="color:var(--green);font-weight:700" class="mono">$1,624</div>
+        <div style="color:var(--text3);font-size:12px">Mar 15</div>
+      </div>
+    </div>
+
+    <!-- Bottom grid: Payouts + How it works -->
+    <div class="bottom-grid">
+      <!-- Payouts -->
+      <div>
+        <div class="section-header"><div class="section-title display">Payout History</div></div>
+        <div class="table-card">
+          <div class="payout-row">
+            <div class="payout-left">
+              <div class="payout-icon" style="background:var(--green-dim)">💰</div>
+              <div>
+                <div class="payout-label">March 2026</div>
+                <div class="payout-date">Processed Apr 5 · 3,640 lots</div>
+              </div>
+            </div>
+            <div class="payout-right">
+              <div class="payout-amt mono" style="color:var(--green)">$29,120</div>
+              <span class="payout-status" style="background:var(--green-dim);color:var(--green)">Paid</span>
+            </div>
+          </div>
+          <div class="payout-row">
+            <div class="payout-left">
+              <div class="payout-icon" style="background:var(--green-dim)">💰</div>
+              <div>
+                <div class="payout-label">February 2026</div>
+                <div class="payout-date">Processed Mar 5 · 2,980 lots</div>
+              </div>
+            </div>
+            <div class="payout-right">
+              <div class="payout-amt mono" style="color:var(--green)">$23,840</div>
+              <span class="payout-status" style="background:var(--green-dim);color:var(--green)">Paid</span>
+            </div>
+          </div>
+          <div class="payout-row">
+            <div class="payout-left">
+              <div class="payout-icon" style="background:var(--gold-dim)">⏳</div>
+              <div>
+                <div class="payout-label">April 2026 (In Progress)</div>
+                <div class="payout-date">Settlement May 5 · 1,812 lots so far</div>
+              </div>
+            </div>
+            <div class="payout-right">
+              <div class="payout-amt mono" style="color:var(--gold)">$14,496</div>
+              <span class="payout-status" style="background:var(--gold-dim);color:var(--gold)">Pending</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- How Tracking Works -->
+      <div>
+        <div class="section-header"><div class="section-title display">How Tracking Works</div></div>
+        <div class="how-card">
+          <div class="how-steps">
+            <div class="how-step">
+              <div class="how-num">01</div>
+              <div class="how-step-title">Share Your Code</div>
+              <div class="how-step-desc">Your audience enters <b style="color:var(--green)">MS-JOHN</b> at signup. Permanently tagged to you.</div>
+            </div>
+            <div class="how-step">
+              <div class="how-num">02</div>
+              <div class="how-step-title">Users Auto-Counted</div>
+              <div class="how-step-desc">Every sign-up with your code adds to your user count and moves you up tiers.</div>
+            </div>
+            <div class="how-step">
+              <div class="how-num">03</div>
+              <div class="how-step-title">Lots Tracked Live</div>
+              <div class="how-step-desc">Every lot your users trade is counted in real-time at your current tier rate.</div>
+            </div>
+            <div class="how-step">
+              <div class="how-num">04</div>
+              <div class="how-step-title">Monthly Payout</div>
+              <div class="how-step-desc">Settled on the 5th. Bank or crypto. Zero fees. Full transparency.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div><!-- /page-dashboard -->
+
+    <!-- ═══ MY USERS PAGE ═══ -->
+    <div id="page-myusers" style="display:none">
+      <div class="header">
+        <div>
+          <h1 class="display">Client List Report</h1>
+          <p style="font-size:13px;color:var(--text3);margin-top:4px">Manage and view all your referred client accounts</p>
+        </div>
+        <div class="header-right">
+          <div style="font-size:12px;color:var(--text3)">Data Last Update: <span class="mono" style="color:var(--text2)">2026-04-13 09:30:00</span></div>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="mu-filters">
+        <div class="mu-filter-row">
+          <input type="text" class="mu-input" placeholder="User ID" />
+          <input type="text" class="mu-input" placeholder="Username" />
+          <input type="text" class="mu-input" placeholder="Email" />
+          <select class="mu-select">
+            <option value="">Role</option>
+            <option>Client</option>
+            <option>IB Agent</option>
+          </select>
+          <select class="mu-select">
+            <option value="">Country</option>
+            <option>India</option>
+            <option>Pakistan</option>
+            <option>UAE</option>
+          </select>
+          <select class="mu-select">
+            <option value="">KYC Status</option>
+            <option>Verified</option>
+            <option>Pending</option>
+            <option>Rejected</option>
+          </select>
+          <input type="date" class="mu-input" style="width:140px" />
+          <input type="date" class="mu-input" style="width:140px" />
+          <button class="btn btn-primary" style="padding:8px 20px">Search</button>
+          <button class="btn btn-secondary" style="padding:8px 16px">Reset</button>
+        </div>
+      </div>
+
+      <!-- Summary Row -->
+      <div class="mu-summary">
+        <span>Total User Account Record: <b style="color:var(--text)">6</b></span>
+        <button class="btn btn-secondary" style="padding:6px 16px;font-size:12px">📥 Export</button>
+      </div>
+
+      <!-- Data Table -->
+      <div class="mu-table-wrap">
+        <table class="mu-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>User ID</th>
+              <th>Username</th>
+              <th>Country</th>
+              <th>Role</th>
+              <th>Phone Number</th>
+              <th>Email</th>
+              <th>Superior Agent</th>
+              <th>Total Balance</th>
+              <th>Total Deposit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td class="mono">30094</td>
+              <td>ZEESHAN A</td>
+              <td>Pakistan</td>
+              <td><span class="badge badge-active">Client</span></td>
+              <td class="mono">+92 312 *****78</td>
+              <td>zee***@gmail.com</td>
+              <td>MS-JOHN</td>
+              <td class="mono" style="color:var(--green)">$4,250.00</td>
+              <td class="mono" style="color:var(--gold)">$12,500.00</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td class="mono">30095</td>
+              <td>KHOULA FA</td>
+              <td>UAE</td>
+              <td><span class="badge badge-active">Client</span></td>
+              <td class="mono">+971 50 *****23</td>
+              <td>kho***@gmail.com</td>
+              <td>MS-JOHN</td>
+              <td class="mono" style="color:var(--green)">$8,120.50</td>
+              <td class="mono" style="color:var(--gold)">$25,000.00</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td class="mono">30096</td>
+              <td>Shridhar S T</td>
+              <td>India</td>
+              <td><span class="badge badge-new">IB Agent</span></td>
+              <td class="mono">+91 98 *****45</td>
+              <td>shr***@yahoo.com</td>
+              <td>MS-JOHN</td>
+              <td class="mono" style="color:var(--green)">$15,340.00</td>
+              <td class="mono" style="color:var(--gold)">$42,000.00</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td class="mono">30097</td>
+              <td>Salma Ansari</td>
+              <td>India</td>
+              <td><span class="badge badge-active">Client</span></td>
+              <td class="mono">+91 88 *****12</td>
+              <td>sal***@gmail.com</td>
+              <td>MS-JOHN</td>
+              <td class="mono" style="color:var(--green)">$2,890.75</td>
+              <td class="mono" style="color:var(--gold)">$8,500.00</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td class="mono">30098</td>
+              <td>SHRIDHAR</td>
+              <td>India</td>
+              <td><span class="badge badge-active">Client</span></td>
+              <td class="mono">+91 77 *****89</td>
+              <td>shr***@outlook.com</td>
+              <td>MS-JOHN</td>
+              <td class="mono" style="color:var(--green)">$6,475.25</td>
+              <td class="mono" style="color:var(--gold)">$18,200.00</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td class="mono">30099</td>
+              <td>Mahesh Ku</td>
+              <td>India</td>
+              <td><span class="badge badge-active">Client</span></td>
+              <td class="mono">+91 99 *****34</td>
+              <td>mah***@gmail.com</td>
+              <td>MS-JOHN</td>
+              <td class="mono" style="color:var(--green)">$1,120.00</td>
+              <td class="mono" style="color:var(--gold)">$3,750.00</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="mu-pagination">
+        <span style="font-size:13px;color:var(--text3)">Showing 1-6 of 6 records</span>
+        <div class="mu-page-btns">
+          <button class="mu-page-btn" disabled>‹ Prev</button>
+          <button class="mu-page-btn mu-page-active">1</button>
+          <button class="mu-page-btn" disabled>Next ›</button>
+        </div>
+      </div>
+    </div><!-- /page-myusers -->
+
+  </main>
+</div>
+
+<script>
+// Supabase client
+const SUPABASE_URL = 'https://rhsjbsyyxpnrvespyedp.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJoc2pic3l5eHBucnZlc3B5ZWRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzQ2MjUsImV4cCI6MjA5MTY1MDYyNX0.e0HGi5sum9KQp474FmpracBBBNg8nT5eX2gTMZzPzmk';
+const { createClient } = window.supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// --- UI helpers ---
+function showDashboard() {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('dashboardLayout').style.display = 'grid';
+}
+
+function showLoginScreen() {
+  document.getElementById('dashboardLayout').style.display = 'none';
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+  switchAuthView('login');
+}
+
+function switchAuthView(view) {
+  const views = { login: 'loginForm', signup: 'signupForm', forgot: 'forgotForm', reset: 'resetForm' };
+  Object.values(views).forEach(id => document.getElementById(id).style.display = 'none');
+  document.getElementById(views[view]).style.display = 'block';
+
+  const title = document.getElementById('authTitle');
+  const subtitle = document.getElementById('authSubtitle');
+  const footer = document.getElementById('authFooter');
+
+  if (view === 'login') {
+    title.textContent = 'Partner Dashboard';
+    subtitle.textContent = 'Sign in to access your partner account';
+    footer.innerHTML = 'Don\'t have an account? <a href="#" onclick="showSignUp(event)">Sign up</a>';
+  } else if (view === 'signup') {
+    title.textContent = 'Create Account';
+    subtitle.textContent = 'Sign up to become a partner';
+    footer.innerHTML = 'Already have an account? <a href="#" onclick="showSignIn(event)">Sign in</a>';
+  } else if (view === 'forgot') {
+    title.textContent = 'Reset Password';
+    subtitle.textContent = 'Enter your email to receive a reset link';
+    footer.innerHTML = 'Remember your password? <a href="#" onclick="showSignIn(event)">Sign in</a>';
+  } else if (view === 'reset') {
+    title.textContent = 'Set New Password';
+    subtitle.textContent = 'Choose a new password for your account';
+    footer.innerHTML = '';
+  }
+}
+
+function showSignUp(e) { e.preventDefault(); switchAuthView('signup'); }
+function showSignIn(e) { e.preventDefault(); switchAuthView('login'); }
+function showForgotPassword(e) { e.preventDefault(); switchAuthView('forgot'); }
+
+// --- Auth handlers ---
+async function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errorEl = document.getElementById('loginError');
+  const btn = e.target.querySelector('.login-btn');
+
+  if (!email || !password) { errorEl.textContent = 'Please fill in all fields.'; return; }
+
+  btn.textContent = 'Signing in...';
+  btn.disabled = true;
+
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+
+  btn.textContent = 'Sign In';
+  btn.disabled = false;
+
+  if (error) {
+    errorEl.textContent = error.message;
+    document.getElementById('loginPassword').value = '';
+    return;
+  }
+  errorEl.textContent = '';
+  showDashboard();
+}
+
+async function handleSignUp(e) {
+  e.preventDefault();
+  const name = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  const errorEl = document.getElementById('signupError');
+  const btn = e.target.querySelector('.login-btn');
+
+  if (!name || !email || !password) { errorEl.textContent = 'Please fill in all fields.'; return; }
+
+  btn.textContent = 'Creating account...';
+  btn.disabled = true;
+
+  const { error } = await sb.auth.signUp({
+    email,
+    password,
+    options: { data: { name } }
+  });
+
+  btn.textContent = 'Create Account';
+  btn.disabled = false;
+
+  if (error) { errorEl.textContent = error.message; return; }
+
+  errorEl.style.color = 'var(--green)';
+  errorEl.textContent = 'Account created! Check your email to confirm, then sign in.';
+}
+
+async function handleForgotPassword(e) {
+  e.preventDefault();
+  const email = document.getElementById('forgotEmail').value.trim();
+  const errorEl = document.getElementById('forgotError');
+  const successEl = document.getElementById('forgotSuccess');
+  const btn = e.target.querySelector('.login-btn');
+
+  if (!email) { errorEl.textContent = 'Please enter your email.'; return; }
+
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+  errorEl.textContent = '';
+  successEl.textContent = '';
+
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname
+  });
+
+  btn.textContent = 'Send Reset Link';
+  btn.disabled = false;
+
+  if (error) { errorEl.textContent = error.message; return; }
+  successEl.textContent = 'Reset link sent! Check your inbox.';
+}
+
+async function handleResetPassword(e) {
+  e.preventDefault();
+  const password = document.getElementById('resetPassword').value;
+  const confirm = document.getElementById('resetPasswordConfirm').value;
+  const errorEl = document.getElementById('resetError');
+  const btn = e.target.querySelector('.login-btn');
+
+  if (password !== confirm) { errorEl.textContent = 'Passwords do not match.'; return; }
+
+  btn.textContent = 'Updating...';
+  btn.disabled = true;
+
+  const { error } = await sb.auth.updateUser({ password });
+
+  btn.textContent = 'Update Password';
+  btn.disabled = false;
+
+  if (error) { errorEl.textContent = error.message; return; }
+  showDashboard();
+}
+
+// Logout handler
+async function handleLogout() {
+  await sb.auth.signOut();
+  showLoginScreen();
+}
+
+// --- Session check on page load ---
+(async function checkSession() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    showDashboard();
+  }
+})();
+
+// Listen for auth state changes (including password recovery redirect)
+sb.auth.onAuthStateChange((event, session) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    // User arrived via reset link — show the new password form
+    document.getElementById('loginScreen').classList.remove('hidden');
+    document.getElementById('dashboardLayout').style.display = 'none';
+    switchAuthView('reset');
+  } else if (event === 'SIGNED_OUT' || !session) {
+    showLoginScreen();
+  }
+});
+
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+
+function copyCode() {
+  navigator.clipboard.writeText('https://marketscore.app/join/MS-JOHN').then(() => {
+    const b = document.querySelector('.btn-primary');
+    b.textContent = '✓ Copied!';
+    setTimeout(() => b.textContent = '📋 Copy Link', 2000);
+  });
+}
+
+function switchPage(page) {
+  // Hide all page sections
+  document.querySelectorAll('[id^="page-"]').forEach(el => el.style.display = 'none');
+  // Show selected page
+  const target = document.getElementById('page-' + page);
+  if (target) target.style.display = 'block';
+  // Update active sidebar item
+  const items = document.querySelectorAll('.sb-item');
+  const pageMap = ['dashboard', 'myusers', 'payouts', 'analytics', 'contentkit', 'settings'];
+  items.forEach((item, i) => {
+    item.classList.toggle('active', pageMap[i] === page);
+  });
+  // Close mobile sidebar
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+function setTab(el) {
+  el.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// Animate tier bar on load
+document.addEventListener('DOMContentLoaded', () => {
+  const fill = document.querySelector('.tier-bar-fill');
+  if (fill) {
+    fill.style.width = '0%';
+    setTimeout(() => { fill.style.width = '69%'; }, 200);
+  }
+});
+</script>
 </body>
 </html>
