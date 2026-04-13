@@ -2017,24 +2017,69 @@ body::before {
               <!-- Bank Transfer Fields -->
               <div id="method-bank">
                 <div class="funds-field">
-                  <select class="funds-select" id="bankAccount">
-                    <option>India Bank Transfer ****2630</option>
+                  <select class="funds-select" id="bankAccount" onchange="toggleBankForm()">
+                    <option value="existing">India Bank Transfer ****2630</option>
                     <option value="add_new">+ Add Bank Account</option>
                   </select>
                 </div>
-                <div class="funds-field">
-                  <select class="funds-select" id="bankName">
-                    <option>Axis Bank</option>
-                  </select>
+
+                <!-- Existing bank details (read-only) -->
+                <div id="bank-existing">
+                  <div class="funds-field">
+                    <select class="funds-select" id="bankName">
+                      <option>Axis Bank</option>
+                    </select>
+                  </div>
+                  <div class="funds-field">
+                    <input type="text" class="funds-input" value="UTIB0005369" placeholder="IFSC Code" readonly style="color:var(--text3)" />
+                  </div>
+                  <div class="funds-field">
+                    <input type="text" class="funds-input" value="Kothanur" placeholder="Branch" readonly style="color:var(--text3)" />
+                  </div>
+                  <div class="funds-field">
+                    <input type="text" class="funds-input" value="Shamique Hussain Vellore Javeed" placeholder="Account Holder Name" readonly style="color:var(--text3)" />
+                  </div>
                 </div>
-                <div class="funds-field">
-                  <input type="text" class="funds-input" value="UTIB0005369" placeholder="IFSC Code" readonly style="color:var(--text3)" />
-                </div>
-                <div class="funds-field">
-                  <input type="text" class="funds-input" value="Kothanur" placeholder="Branch" readonly style="color:var(--text3)" />
-                </div>
-                <div class="funds-field">
-                  <input type="text" class="funds-input" value="Shamique Hussain Vellore Javeed" placeholder="Account Holder Name" readonly style="color:var(--text3)" />
+
+                <!-- Add new bank account form -->
+                <div id="bank-add-new" style="display:none">
+                  <div class="funds-field">
+                    <select class="funds-select" id="newBankName">
+                      <option value="">Bank Name</option>
+                      <option>Axis Bank</option>
+                      <option>HDFC Bank</option>
+                      <option>ICICI Bank</option>
+                      <option>State Bank of India</option>
+                      <option>Punjab National Bank</option>
+                      <option>Bank of Baroda</option>
+                      <option>Kotak Mahindra Bank</option>
+                      <option>IndusInd Bank</option>
+                      <option>Yes Bank</option>
+                      <option>Union Bank of India</option>
+                    </select>
+                  </div>
+                  <div class="funds-field">
+                    <input type="text" class="funds-input" id="newIfsc" placeholder="IFSC Code" />
+                  </div>
+                  <div class="funds-field">
+                    <input type="text" class="funds-input" id="newBranch" placeholder="Bank Branch" />
+                  </div>
+                  <div class="funds-field">
+                    <input type="text" class="funds-input" id="newAccName" placeholder="Account Name" />
+                  </div>
+                  <div class="funds-field">
+                    <input type="text" class="funds-input" id="newAccNumber" placeholder="Account Number" />
+                  </div>
+                  <div class="funds-field">
+                    <input type="text" class="funds-input" id="newBankNotes" placeholder="Important notes" />
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+                    <input type="checkbox" id="rememberBank" checked style="accent-color:var(--green);width:16px;height:16px" />
+                    <label for="rememberBank" style="font-size:13px;color:var(--text2);cursor:pointer">Remember my account</label>
+                  </div>
+                  <div id="bankMinWarning" style="font-size:12px;color:var(--red);line-height:1.6;margin-bottom:16px;display:none">
+                    The applied withdrawal amount is less than the minimum 2.00 USD for the applied payment gateway. Please top up your account balance to/over the minimum before submitting a withdrawal request.
+                  </div>
                 </div>
               </div>
 
@@ -2424,6 +2469,21 @@ function toggleMethodFields() {
   document.getElementById('method-crypto').style.display = method === 'crypto' ? 'block' : 'none';
   var amt = parseFloat(document.getElementById('withdrawAmount').value) || 0;
   checkCryptoMin(amt);
+  if (method === 'bank') toggleBankForm();
+}
+
+function toggleBankForm() {
+  var val = document.getElementById('bankAccount').value;
+  document.getElementById('bank-existing').style.display = val === 'add_new' ? 'none' : 'block';
+  document.getElementById('bank-add-new').style.display = val === 'add_new' ? 'block' : 'none';
+  // Show minimum warning for new bank if amount is low
+  var amt = parseFloat(document.getElementById('withdrawAmount').value) || 0;
+  var warn = document.getElementById('bankMinWarning');
+  if (val === 'add_new' && amt < 2) {
+    warn.style.display = 'block';
+  } else {
+    warn.style.display = 'none';
+  }
 }
 
 function checkCryptoMin(amt) {
