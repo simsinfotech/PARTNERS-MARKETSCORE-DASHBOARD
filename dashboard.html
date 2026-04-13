@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MarketScore — Partner Dashboard</title>
-<link rel="icon" type="image/png" href="marketscore logo.png" />
+<link rel="icon" type="image/png" href="App Icon.png" />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -73,8 +73,24 @@ body::before {
 
 @media (max-width: 900px) {
   .layout { grid-template-columns: 1fr; }
-  .sidebar { display: none; }
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+    z-index: 200;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
   .sidebar-mobile { display: flex !important; }
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 150;
+    backdrop-filter: blur(4px);
+  }
+  .sidebar-overlay.open { display: block; }
 }
 
 /* Sidebar */
@@ -376,7 +392,21 @@ body::before {
 
 .tier-progress { width: 200px; }
 
-@media (max-width: 600px) { .tier-progress { width: 100%; } }
+@media (max-width: 600px) {
+  .tier-progress { width: 100%; }
+  .tier-card { flex-direction: column; align-items: flex-start; }
+  .ref-card { flex-direction: column; align-items: flex-start; }
+  .ref-code { font-size: 24px; }
+  .ref-btns { width: 100%; }
+  .ref-btns .btn { flex: 1; text-align: center; }
+  .header h1 { font-size: 22px !important; }
+  .header { flex-direction: column; align-items: flex-start; }
+  .stat-value { font-size: 24px; }
+  .payout-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .payout-right { width: 100%; justify-content: space-between; }
+  .rm-tier { flex-wrap: wrap; gap: 8px; }
+  .rm-range { width: 100%; margin-top: 2px; }
+}
 
 .tier-bar-labels {
   display: flex;
@@ -816,8 +846,7 @@ body::before {
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sb-logo">
-      <img src="marketscore logo.png" alt="MarketScore" />
-      <span class="display">MarketScore</span>
+      <img src="darkmode logo.png" alt="MarketScore" style="height:32px;width:auto;border-radius:0" />
     </div>
 
     <nav class="sb-nav">
@@ -848,11 +877,16 @@ body::before {
     </div>
   </aside>
 
+  <!-- Mobile Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
   <!-- Mobile Header -->
   <div class="sidebar-mobile">
-    <div style="display:flex;align-items:center;gap:8px">
-      <img src="marketscore logo.png" alt="MS" style="width:32px;height:32px;border-radius:7px;object-fit:contain" />
-      <span class="display" style="font-weight:800;font-size:15px">MarketScore</span>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button onclick="toggleSidebar()" style="background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;justify-content:center">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F0F4F8" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <img src="darkmode logo.png" alt="MS" style="height:28px;object-fit:contain" />
     </div>
     <div class="live-badge">
       <span class="live-dot"></span> Live
@@ -1154,6 +1188,11 @@ body::before {
 </div>
 
 <script>
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+
 function copyCode() {
   navigator.clipboard.writeText('https://marketscore.app/join/MS-JOHN').then(() => {
     const b = document.querySelector('.btn-primary');
