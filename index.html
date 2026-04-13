@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MarketScore — Direct WhatsApp Outreach</title>
-  <link rel="icon" type="image/png" href="marketscore logo.png" />
+  <title>MarketScore — Partner Program</title>
+  <link rel="icon" type="image/png" href="App Icon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -12,7 +13,180 @@
 <body>
   <div id="root"></div>
   <script type="text/babel">
-const { useState, useEffect } = React;
+const { useState, useEffect, useRef, useCallback } = React;
+
+/* ─── SVG Icon Components (Lucide-style) ─── */
+const Icon = ({ children, size = 24, color = "currentColor", style = {}, ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24"
+    fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+    style={{ display: "inline-block", verticalAlign: "middle", flexShrink: 0, ...style }} {...props}>
+    {children}
+  </svg>
+);
+
+// Tier icons
+const IconBronzeMedal = ({ size, color, style }) => (
+  <Icon size={size} color={color} style={style}>
+    <circle cx="12" cy="8" r="6" fill={color || "#cd7f32"} stroke={color || "#cd7f32"} strokeWidth="1.5" opacity="0.2" />
+    <circle cx="12" cy="8" r="6" />
+    <path d="M12 2v2" /><path d="M12 14v2" />
+    <path d="m8 16-2 6h12l-2-6" />
+    <path d="M9 14.5 12 12l3 2.5" />
+  </Icon>
+);
+
+const IconSilverMedal = ({ size, color, style }) => (
+  <Icon size={size} color={color} style={style}>
+    <circle cx="12" cy="8" r="6" fill={color || "#c0c0c0"} stroke={color || "#c0c0c0"} strokeWidth="1.5" opacity="0.2" />
+    <circle cx="12" cy="8" r="6" />
+    <path d="m8 16-2 6h12l-2-6" />
+    <path d="M10 6h4l-2 4-2-4z" fill={color || "#c0c0c0"} opacity="0.4" />
+  </Icon>
+);
+
+const IconGoldMedal = ({ size, color, style }) => (
+  <Icon size={size} color={color} style={style}>
+    <circle cx="12" cy="8" r="6" fill={color || "#ffc44d"} stroke={color || "#ffc44d"} strokeWidth="1.5" opacity="0.25" />
+    <circle cx="12" cy="8" r="6" />
+    <path d="m8 16-2 6h12l-2-6" />
+    <polygon points="12,4 13.5,7 17,7.5 14.5,10 15,13.5 12,12 9,13.5 9.5,10 7,7.5 10.5,7" fill={color || "#ffc44d"} opacity="0.4" stroke="none" />
+  </Icon>
+);
+
+const IconDiamond = ({ size, color, style }) => (
+  <Icon size={size} color={color} style={style}>
+    <path d="M6 3h12l4 6-10 13L2 9z" fill={color || "#b9f2ff"} opacity="0.15" />
+    <path d="M6 3h12l4 6-10 13L2 9z" />
+    <path d="M2 9h20" /><path d="m10 3-4 6 6 13 6-13-4-6" />
+  </Icon>
+);
+
+const IconCrown = ({ size, color, style }) => (
+  <Icon size={size} color={color} style={style}>
+    <path d="M2 17 5 8l4 4 3-6 3 6 4-4 3 9z" fill={color || "#e5e4e2"} opacity="0.2" />
+    <path d="M2 17 5 8l4 4 3-6 3 6 4-4 3 9z" />
+    <path d="M4 19h16" strokeWidth="2.5" />
+  </Icon>
+);
+
+// Feature / Section icons
+const IconRadar = ({ size = 24, color = "currentColor", style }) => (
+  <Icon size={size} color={color} style={style}>
+    <path d="M19.07 4.93A10 10 0 0 0 2 12c0 5.52 4.48 10 10 10s10-4.48 10-10" />
+    <path d="M15.54 8.46A5 5 0 0 0 7 12c0 2.76 2.24 5 5 5s5-2.24 5-5" />
+    <line x1="12" y1="12" x2="20" y2="4" />
+  </Icon>
+);
+
+const IconBarChart = ({ size = 24, color = "currentColor", style }) => (
+  <Icon size={size} color={color} style={style}>
+    <rect x="3" y="12" width="4" height="9" rx="1" fill={color} opacity="0.15" />
+    <rect x="10" y="7" width="4" height="14" rx="1" fill={color} opacity="0.15" />
+    <rect x="17" y="3" width="4" height="18" rx="1" fill={color} opacity="0.15" />
+    <rect x="3" y="12" width="4" height="9" rx="1" /><rect x="10" y="7" width="4" height="14" rx="1" /><rect x="17" y="3" width="4" height="18" rx="1" />
+  </Icon>
+);
+
+const IconPalette = ({ size = 24, color = "currentColor", style }) => (
+  <Icon size={size} color={color} style={style}>
+    <circle cx="13.5" cy="6.5" r="1.5" fill={color} opacity="0.4" /><circle cx="17.5" cy="10.5" r="1.5" fill={color} opacity="0.4" />
+    <circle cx="8.5" cy="7.5" r="1.5" fill={color} opacity="0.4" /><circle cx="6.5" cy="12.5" r="1.5" fill={color} opacity="0.4" />
+    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.04-.23-.29-.38-.63-.38-1.03 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-5.17-4.5-9-10-9z" />
+  </Icon>
+);
+
+const IconShield = ({ size = 24, color = "currentColor", style }) => (
+  <Icon size={size} color={color} style={style}>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill={color} opacity="0.12" />
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    <path d="m9 12 2 2 4-4" />
+  </Icon>
+);
+
+const IconHandshake = ({ size = 24, color = "currentColor", style }) => (
+  <Icon size={size} color={color} style={style}>
+    <path d="m11 17 2 2a1 1 0 1 0 3-3" /><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3L14 8" />
+    <path d="m8 15 2-2" /><path d="m2 10 4-4 4 4" /><path d="m14 4 4 4 4-4" />
+    <path d="M3 13h2" /><path d="M19 13h2" />
+  </Icon>
+);
+
+const IconZap = ({ size = 24, color = "currentColor", style }) => (
+  <Icon size={size} color={color} style={style}>
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill={color} opacity="0.15" />
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+  </Icon>
+);
+
+const IconTarget = ({ size = 24, color = "currentColor", style }) => (
+  <Icon size={size} color={color} style={style}>
+    <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" fill={color} opacity="0.3" />
+    <line x1="22" y1="12" x2="18" y2="12" /><line x1="6" y1="12" x2="2" y2="12" />
+    <line x1="12" y1="6" x2="12" y2="2" /><line x1="12" y1="22" x2="12" y2="18" />
+  </Icon>
+);
+
+const IconTrophy = ({ size = 24, color = "currentColor", style }) => (
+  <Icon size={size} color={color} style={style}>
+    <path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2" /><path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2" />
+    <path d="M6 3h12v7a6 6 0 0 1-12 0V3z" fill={color} opacity="0.12" />
+    <path d="M6 3h12v7a6 6 0 0 1-12 0V3z" />
+    <path d="M9 21h6" /><path d="M12 16v5" />
+  </Icon>
+);
+
+const IconDollarSign = ({ size = 24, color = "currentColor", style }) => (
+  <Icon size={size} color={color} style={style}>
+    <circle cx="12" cy="12" r="10" fill={color} opacity="0.1" />
+    <line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+  </Icon>
+);
+
+const IconArrowRight = ({ size = 24, color = "currentColor", style }) => (
+  <Icon size={size} color={color} style={style}>
+    <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+  </Icon>
+);
+
+const IconArrowDown = ({ size = 24, color = "currentColor", style }) => (
+  <Icon size={size} color={color} style={style}>
+    <line x1="12" y1="5" x2="12" y2="19" /><polyline points="19 12 12 19 5 12" />
+  </Icon>
+);
+
+const IconCheck = ({ size = 24, color = "currentColor", style }) => (
+  <Icon size={size} color={color} style={style}>
+    <polyline points="20 6 9 17 4 12" />
+  </Icon>
+);
+
+const IconCode = ({ size = 24, color = "currentColor", style }) => (
+  <Icon size={size} color={color} style={style}>
+    <polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" />
+  </Icon>
+);
+
+const IconUsers = ({ size = 24, color = "currentColor", style }) => (
+  <Icon size={size} color={color} style={style}>
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </Icon>
+);
+
+const IconTrendingUp = ({ size = 24, color = "currentColor", style }) => (
+  <Icon size={size} color={color} style={style}>
+    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" />
+  </Icon>
+);
+
+// Map tier names to icon components
+const TIER_ICONS = {
+  Bronze: IconBronzeMedal,
+  Silver: IconSilverMedal,
+  Gold: IconGoldMedal,
+  Diamond: IconDiamond,
+  Platinum: IconCrown,
+};
 
 const C = {
   bg: "#04070D", surface: "#0B1120", card: "#111B2E",
@@ -30,7 +204,7 @@ const analytics = {
   init() {
     const p = new URLSearchParams(window.location.search);
     this._ref = p.get("ref") || "direct";
-    this.track("page_view", { source: "direct_outreach", ref: this._ref });
+    this.track("page_view", { source: "partner_program", ref: this._ref });
     let fired = new Set();
     window.addEventListener("scroll", () => {
       const pct = Math.round((window.pageYOffset / (document.documentElement.scrollHeight - window.innerHeight)) * 100);
@@ -42,507 +216,1206 @@ const analytics = {
     this._n++;
     const p = { event: e, t: Math.round((Date.now() - this._start) / 1000), ...d };
     this._q.push(p);
-    try { if (window.gtag) window.gtag("event", e, { ...d, source: "direct_outreach" }); } catch {}
-    if (window.location.hostname === "localhost") console.log(`[MS-DM] ${e}`, p);
+    try { if (window.gtag) window.gtag("event", e, { ...d, source: "partner_program" }); } catch {}
+    if (window.location.hostname === "localhost") console.log(`[MS-PP] ${e}`, p);
   },
 };
 
-const INSTRUMENTS = [
-  { sym: "GOLD", emoji: "\u{1F947}", cat: "commodity", price: "2,945.80", chg: "+0.42%", scores: { t: 2, f: 2, s: 1, c: 2 } },
-  { sym: "BTC/USD", emoji: "\u{20BF}", cat: "crypto", price: "97,420", chg: "+2.15%", scores: { t: 2, f: 1, s: 2, c: 1 } },
-  { sym: "EUR/USD", emoji: "\u{1F1EA}\u{1F1FA}", cat: "forex", price: "1.0862", chg: "+0.22%", scores: { t: 1, f: 0, s: 1, c: 1 } },
-  { sym: "NASDAQ", emoji: "\u{1F4C8}", cat: "index", price: "16,142", chg: "+0.60%", scores: { t: 2, f: 2, s: -1, c: 1 } },
-  { sym: "CRUDE", emoji: "\u{1F6E2}\u{FE0F}", cat: "commodity", price: "71.45", chg: "-1.14%", scores: { t: -2, f: -1, s: -1, c: -1 } },
-  { sym: "ETH/USD", emoji: "\u{27E0}", cat: "crypto", price: "3,842", chg: "+1.87%", scores: { t: 2, f: 1, s: 1, c: 1 } },
-  { sym: "GBP/USD", emoji: "\u{1F1EC}\u{1F1E7}", cat: "forex", price: "1.2685", chg: "+0.14%", scores: { t: 1, f: 1, s: 0, c: 1 } },
-  { sym: "SILVER", emoji: "\u{1F948}", cat: "commodity", price: "33.28", chg: "+1.28%", scores: { t: 2, f: 2, s: 0, c: 1 } },
-  { sym: "USD/JPY", emoji: "\u{1F1EF}\u{1F1F5}", cat: "forex", price: "149.85", chg: "-0.28%", scores: { t: -2, f: -1, s: -1, c: -2 } },
+const PARTNER_TIERS = [
+  { name: "Bronze", rate: 7, max: 200, color: "#cd7f32" },
+  { name: "Silver", rate: 8, max: 500, color: "#c0c0c0" },
+  { name: "Gold", rate: 9, max: 1000, color: "#ffc44d" },
+  { name: "Diamond", rate: 10, max: 1500, color: "#b9f2ff" },
+  { name: "Platinum", rate: 12, max: Infinity, color: "#e5e4e2" },
 ];
 
-const total = (s) => s.t + s.f + s.s + s.c;
-const bias = (s) => s >= 5 ? { l: "Strong Buy", c: "#00FF88" } : s >= 2 ? { l: "Buy", c: C.accent } : s >= -1 ? { l: "Neutral", c: C.textMuted } : s >= -4 ? { l: "Sell", c: C.red } : { l: "Strong Sell", c: "#FF2244" };
-const fc = (v) => v >= 2 ? "#00FF88" : v >= 1 ? C.accent : v === 0 ? C.textMuted : v >= -1 ? C.gold : C.red;
+const getPartnerTier = (users) => {
+  for (const t of PARTNER_TIERS) { if (users <= t.max) return t; }
+  return PARTNER_TIERS[PARTNER_TIERS.length - 1];
+};
 
-const LiveScorecard = () => {
-  const [sel, setSel] = useState(0);
-  const [filter, setFilter] = useState("all");
-  const filtered = filter === "all" ? INSTRUMENTS : INSTRUMENTS.filter(i => i.cat === filter);
-  const inst = INSTRUMENTS[sel];
-  const s = total(inst.scores);
-  const b = bias(s);
+/* ─── Particle Canvas ─── */
+const ParticleCanvas = () => {
+  const canvasRef = useRef(null);
+  const mouseRef = useRef({ x: -1000, y: -1000 });
+  const particlesRef = useRef([]);
+  const animRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let w, h;
+
+    const resize = () => {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const isMobile = window.innerWidth < 768;
+    const count = isMobile ? 70 : 180;
+    const particles = [];
+
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * w, y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.7, vy: (Math.random() - 0.5) * 0.7,
+        r: Math.random() * 3 + 1,
+        o: Math.random() * 0.6 + 0.3,
+        pulse: Math.random() * Math.PI * 2,
+        pulseSpeed: Math.random() * 0.02 + 0.01,
+      });
+    }
+    particlesRef.current = particles;
+
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h);
+      const mx = mouseRef.current.x;
+      const my = mouseRef.current.y;
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        // Mouse interaction — larger radius, stronger force
+        const dx = p.x - mx;
+        const dy = p.y - my;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 220 && dist > 0) {
+          const force = (220 - dist) / 220 * 1.2;
+          p.vx += (dx / dist) * force;
+          p.vy += (dy / dist) * force;
+        }
+
+        p.vx *= 0.97;
+        p.vy *= 0.97;
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0) p.x = w;
+        if (p.x > w) p.x = 0;
+        if (p.y < 0) p.y = h;
+        if (p.y > h) p.y = 0;
+
+        // Pulsing glow per particle
+        p.pulse += p.pulseSpeed;
+        const pulseAlpha = p.o * (0.7 + 0.3 * Math.sin(p.pulse));
+
+        // Outer glow
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 229, 176, ${pulseAlpha * 0.08})`;
+        ctx.fill();
+
+        // Core particle
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 229, 176, ${pulseAlpha})`;
+        ctx.fill();
+
+        // Bright center dot
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 0.4, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${pulseAlpha * 0.6})`;
+        ctx.fill();
+
+        // Connection lines — longer range, brighter
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const cdx = p.x - p2.x;
+          const cdy = p.y - p2.y;
+          const cd = Math.sqrt(cdx * cdx + cdy * cdy);
+          if (cd < 160) {
+            const lineAlpha = 0.15 * (1 - cd / 160);
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(0, 229, 176, ${lineAlpha})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+
+        // Mouse proximity glow line
+        if (dist < 200 && dist > 0) {
+          const glowAlpha = 0.25 * (1 - dist / 200);
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(mx, my);
+          ctx.strokeStyle = `rgba(0, 229, 176, ${glowAlpha})`;
+          ctx.lineWidth = 0.6;
+          ctx.stroke();
+        }
+      }
+      animRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+
+    return () => {
+      window.removeEventListener("resize", resize);
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+    };
+  }, []);
+
+  const handleMouseMove = useCallback((e) => {
+    mouseRef.current = { x: e.clientX, y: e.clientY };
+  }, []);
 
   return (
-    <div style={{
-      background: C.bg, borderRadius: 20, border: `1px solid ${C.border}`,
-      overflow: "hidden", maxWidth: 460, margin: "0 auto",
-      boxShadow: `0 20px 60px rgba(0,0,0,0.5), 0 0 40px ${C.accent}06`,
+    <canvas
+      ref={canvasRef}
+      onMouseMove={handleMouseMove}
+      style={{
+        position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
+        pointerEvents: "auto", zIndex: 0,
+      }}
+    />
+  );
+};
+
+/* ─── Animated Counter ─── */
+const AnimatedCounter = ({ end, prefix = "", suffix = "", duration = 2000, decimals = 0, trigger = true }) => {
+  const [val, setVal] = useState(0);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!trigger) return;
+    let start = 0;
+    const startTime = performance.now();
+    const animate = (now) => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setVal(eased * end);
+      if (progress < 1) ref.current = requestAnimationFrame(animate);
+    };
+    ref.current = requestAnimationFrame(animate);
+    return () => { if (ref.current) cancelAnimationFrame(ref.current); };
+  }, [end, duration, trigger]);
+
+  return (
+    <span style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+      {prefix}{decimals > 0 ? val.toFixed(decimals) : Math.round(val).toLocaleString()}{suffix}
+    </span>
+  );
+};
+
+/* ─── Intersection Observer Hook ─── */
+const useInView = (options = {}) => {
+  const ref = useRef(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setInView(true); obs.disconnect(); }
+    }, { threshold: 0.15, ...options });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return [ref, inView];
+};
+
+/* ─── Scroll Animated Section ─── */
+const ScrollReveal = ({ children, delay = 0, direction = "up", style = {} }) => {
+  const [ref, inView] = useInView();
+  const transforms = {
+    up: "translateY(60px)",
+    down: "translateY(-60px)",
+    left: "translateX(-60px)",
+    right: "translateX(60px)",
+  };
+  return (
+    <div ref={ref} style={{
+      opacity: inView ? 1 : 0,
+      transform: inView ? "translate(0,0)" : transforms[direction],
+      transition: `opacity 0.8s cubic-bezier(0.16,1,0.3,1) ${delay}s, transform 0.8s cubic-bezier(0.16,1,0.3,1) ${delay}s`,
+      ...style,
     }}>
+      {children}
+    </div>
+  );
+};
+
+/* ─── 3D Tilt Card ─── */
+const TiltCard = ({ children, style = {}, className = "" }) => {
+  const cardRef = useRef(null);
+  const [transform, setTransform] = useState("");
+  const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
+  const handleMouseMove = (e) => {
+    if (isMobile) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    const rotateX = (y - 0.5) * -12;
+    const rotateY = (x - 0.5) * 12;
+    setTransform(`perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`);
+    setGlowPos({ x: x * 100, y: y * 100 });
+  };
+
+  const handleMouseLeave = () => {
+    setTransform("");
+    setGlowPos({ x: 50, y: 50 });
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      className={className}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        transform, transition: transform ? "transform 0.1s ease" : "transform 0.5s cubic-bezier(0.16,1,0.3,1)",
+        position: "relative", overflow: "hidden", ...style,
+      }}
+    >
       <div style={{
-        display: "flex", justifyContent: "space-between", alignItems: "center",
-        padding: "8px 16px", background: C.surface, borderBottom: `1px solid ${C.border}`,
+        position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+        background: `radial-gradient(circle at ${glowPos.x}% ${glowPos.y}%, ${C.accent}12, transparent 60%)`,
+        pointerEvents: "none", transition: "background 0.2s",
+      }} />
+      {children}
+    </div>
+  );
+};
+
+/* ─── Typewriter ─── */
+const Typewriter = ({ text, speed = 50, delay = 500 }) => {
+  const [displayed, setDisplayed] = useState("");
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setStarted(true), delay);
+    return () => clearTimeout(t);
+  }, [delay]);
+
+  useEffect(() => {
+    if (!started) return;
+    let i = 0;
+    const iv = setInterval(() => {
+      i++;
+      setDisplayed(text.slice(0, i));
+      if (i >= text.length) clearInterval(iv);
+    }, speed);
+    return () => clearInterval(iv);
+  }, [started, text, speed]);
+
+  return (
+    <span>
+      {displayed}
+      <span style={{
+        display: "inline-block", width: 2, height: "0.9em",
+        background: C.accent, marginLeft: 2, verticalAlign: "middle",
+        animation: "blink 1s step-end infinite",
+        opacity: displayed.length >= text.length ? 0 : 1,
+      }} />
+    </span>
+  );
+};
+
+/* ─── Stats Ticker ─── */
+const StatsTicker = () => {
+  const [ref, inView] = useInView();
+  const stats = [
+    { value: "$72K", label: "Monthly Potential", IconComp: IconDollarSign, color: C.accent },
+    { value: "500+", label: "Active Partners", IconComp: IconUsers, color: C.blue },
+    { value: "5", label: "Commission Tiers", IconComp: IconTrophy, color: C.gold },
+    { value: "$12", label: "Max Per Lot", IconComp: IconZap, color: C.purple },
+    { value: "0%", label: "Platform Fees", IconComp: IconShield, color: C.accent },
+  ];
+
+  const marqueeItems = [
+    "Real-time dashboard", "Monthly payouts", "No follower minimum",
+    "AI-powered signals", "Zero fees", "Branded content assets",
+    "Crypto & bank payouts", "Auto tier upgrades", "Performance wins",
+  ];
+  const doubled = [...marqueeItems, ...marqueeItems];
+
+  return (
+    <div ref={ref} style={{ position: "relative", overflow: "hidden" }}>
+      {/* Glowing top border */}
+      <div style={{
+        height: 1,
+        background: `linear-gradient(90deg, transparent, ${C.accent}60, ${C.blue}60, ${C.purple}60, transparent)`,
+      }} />
+
+      {/* Main stats row */}
+      <div style={{
+        background: `linear-gradient(180deg, ${C.surface}F0, ${C.bg}F0)`,
+        backdropFilter: "blur(10px)",
+        padding: "28px 0 20px",
       }}>
-        <span style={{ fontSize: 10, color: C.textMuted, width: 50 }}>9:52 AM</span>
-        <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-          <img src="marketscore logo.png" alt="M" style={{ width: 28, height: 28, borderRadius: 5, objectFit: "contain" }} />
-          <span style={{ fontSize: 11, fontWeight: 700, color: C.accent }}>MarketScore</span>
-        </div>
-        <span style={{ fontSize: 10, color: C.textMuted, width: 50, textAlign: "right" }}>5G</span>
-      </div>
-
-      <div style={{ display: "flex", gap: 4, padding: "10px 12px", overflowX: "auto" }}>
-        {[{ id: "all", l: "All" }, { id: "forex", l: "Forex" }, { id: "crypto", l: "Crypto" }, { id: "commodity", l: "Commodities" }, { id: "index", l: "Indices" }].map(f => (
-          <div key={f.id} onClick={() => { setFilter(f.id); analytics.track("scorecard_filter", { cat: f.id }); }} style={{
-            padding: "4px 12px", borderRadius: 16, cursor: "pointer", whiteSpace: "nowrap",
-            background: filter === f.id ? `${C.accent}15` : "transparent",
-            border: `1px solid ${filter === f.id ? C.accent + "30" : C.border}`,
-            fontSize: 10, fontWeight: 700, color: filter === f.id ? C.accent : C.textMuted,
-          }}>{f.l}</div>
-        ))}
-      </div>
-
-      <div style={{ height: 200, overflowY: "auto", padding: "0 8px" }}>
-        {filtered.map((inst) => {
-          const sc = total(inst.scores); const bi = bias(sc); const idx = INSTRUMENTS.indexOf(inst);
-          return (
-            <div key={inst.sym} onClick={() => { setSel(idx); analytics.track("scorecard_tap", { sym: inst.sym, score: sc }); }} style={{
-              display: "flex", alignItems: "center", gap: 8, padding: "7px 10px",
-              borderRadius: 10, cursor: "pointer", marginBottom: 2,
-              background: sel === idx ? `${bi.c}08` : "transparent",
-              border: `1px solid ${sel === idx ? bi.c + "20" : "transparent"}`,
+        <div style={{
+          maxWidth: 1000, margin: "0 auto", padding: "0 24px",
+          display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 16,
+        }}>
+          {stats.map((s, i) => (
+            <div key={i} style={{
+              flex: "1 1 160px", textAlign: "center",
+              opacity: inView ? 1 : 0,
+              transform: inView ? "translateY(0)" : "translateY(20px)",
+              transition: `all 0.6s cubic-bezier(0.16,1,0.3,1) ${i * 0.1}s`,
             }}>
+              <div style={{ marginBottom: 6 }}><s.IconComp size={24} color={s.color} /></div>
               <div style={{
-                width: 30, height: 30, borderRadius: 15,
-                background: `${bi.c}12`, border: `1px solid ${bi.c}25`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 11, fontWeight: 900, color: bi.c,
-              }}>{sc > 0 ? `+${sc}` : sc}</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                  <span style={{ fontSize: 10 }}>{inst.emoji}</span>
-                  <span style={{ fontSize: 11, fontWeight: 800 }}>{inst.sym}</span>
-                  <span style={{ fontSize: 7, fontWeight: 800, color: bi.c, marginLeft: 4, background: `${bi.c}12`, padding: "1px 5px", borderRadius: 3 }}>{bi.l}</span>
-                </div>
-                <div style={{ display: "flex", gap: 2, marginTop: 3 }}>
-                  {[inst.scores.t, inst.scores.f, inst.scores.s, inst.scores.c].map((v, j) => (
-                    <div key={j} style={{ width: 14, height: 14, borderRadius: 3, fontSize: 6, fontWeight: 900, background: `${fc(v)}12`, border: `1px solid ${fc(v)}25`, color: fc(v), display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      {v > 0 ? "\u25B2" : v < 0 ? "\u25BC" : "\u2014"}
-                    </div>
-                  ))}
-                </div>
+                fontFamily: "'Outfit', sans-serif", fontSize: 32, fontWeight: 900,
+                letterSpacing: -1.5,
+                background: `linear-gradient(135deg, ${s.color}, ${s.color}AA)`,
+                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                lineHeight: 1,
+              }}>
+                {inView ? s.value : "—"}
               </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 11, fontWeight: 700 }}>{inst.price}</div>
-                <div style={{ fontSize: 9, fontWeight: 700, color: inst.chg.startsWith("+") ? C.accent : C.red }}>{inst.chg}</div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <div style={{ margin: "6px 8px 8px", borderRadius: 12, padding: 14, background: `${b.c}06`, border: `1px solid ${b.c}15` }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ fontSize: 16 }}>{inst.emoji}</span>
-            <span style={{ fontSize: 14, fontWeight: 900 }}>{inst.sym}</span>
-          </div>
-          <div style={{ background: `${b.c}15`, border: `1px solid ${b.c}25`, borderRadius: 6, padding: "3px 10px" }}>
-            <span style={{ fontSize: 11, fontWeight: 800, color: b.c }}>{s > 0 ? "+" : ""}{s}/8 — {b.l}</span>
-          </div>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 6 }}>
-          {[{ l: "Technical", i: "growth (1).png", v: inst.scores.t }, { l: "Fundamental", i: "bank.png", v: inst.scores.f }, { l: "Sentiment", i: "people.png", v: inst.scores.s }, { l: "COT", i: "institution.png", v: inst.scores.c }].map(f => (
-            <div key={f.l} style={{ background: C.bg, borderRadius: 8, padding: "6px 4px", textAlign: "center", border: `1px solid ${C.border}` }}>
-              <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto" }}>
-                <img src={f.i} alt={f.l} style={{ width: 16, height: 16, objectFit: "contain" }} />
-              </div>
-              <div style={{ fontSize: 14, fontWeight: 900, color: fc(f.v), marginTop: 2 }}>{f.v > 0 ? `+${f.v}` : f.v}</div>
-              <div style={{ fontSize: 7, color: C.textMuted, fontWeight: 700, marginTop: 1 }}>{f.l}</div>
+              <div style={{
+                fontFamily: "'JetBrains Mono', monospace", fontSize: 10,
+                letterSpacing: 1.5, textTransform: "uppercase", color: C.textMuted,
+                marginTop: 6,
+              }}>{s.label}</div>
             </div>
           ))}
         </div>
       </div>
-    </div>
-  );
-};
 
-const StickyWA = () => {
-  const [show, setShow] = useState(false);
-  useEffect(() => {
-    const h = () => setShow(window.scrollY > 400);
-    window.addEventListener("scroll", h);
-    return () => window.removeEventListener("scroll", h);
-  }, []);
-  return (
-    <div className="sticky-wa" style={{
-      position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 95,
-      background: `${C.bg}F0`, backdropFilter: "blur(16px)",
-      borderTop: `1px solid ${C.border}`, padding: "10px 24px",
-      display: "flex", justifyContent: "center", alignItems: "center", gap: 14,
-      flexWrap: "wrap",
-      transform: show ? "translateY(0)" : "translateY(100%)", transition: "transform .3s",
-    }}>
-      <span style={{ fontSize: 13, color: C.textSec, fontWeight: 600 }}>Ready to try it?</span>
-      <a href={WA_LINK} target="_blank" rel="noopener" onClick={() => analytics.track("wa_click", { loc: "sticky" })} style={{
-        background: C.wa, color: "#fff", padding: "10px 24px",
-        borderRadius: 10, fontWeight: 800, fontSize: 14, textDecoration: "none",
-        display: "flex", alignItems: "center", gap: 8,
-      }}><img src="whatsapp.png" alt="WhatsApp" style={{ width: 20, height: 20, objectFit: "contain" }} /> Message Us on WhatsApp</a>
-    </div>
-  );
-};
-
-// ═══════════════════════════════════════
-// EXIT-INTENT POPUP
-// ═══════════════════════════════════════
-const ExitPopup = ({ show, onClose }) => {
-  if (!show) return null;
-  return (
-    <div onClick={onClose} style={{
-      position: "fixed", inset: 0, zIndex: 300,
-      background: "rgba(0,0,0,0.75)", backdropFilter: "blur(10px)",
-      display: "flex", alignItems: "center", justifyContent: "center",
-    }}>
-      <div onClick={(e) => e.stopPropagation()} style={{
-        background: C.surface, borderRadius: 22, padding: "40px 36px", maxWidth: 420, width: "90%",
-        border: `1px solid ${C.wa}25`, position: "relative", textAlign: "center",
-        boxShadow: `0 24px 60px rgba(0,0,0,0.6), 0 0 40px ${C.wa}10`,
-        animation: "fadeUp .4s ease-out",
+      {/* Animated marquee strip below */}
+      <div style={{
+        overflow: "hidden", padding: "10px 0",
+        background: `${C.bg}`,
+        borderTop: `1px solid ${C.border}30`,
+        position: "relative",
       }}>
-        <div onClick={onClose} style={{
-          position: "absolute", top: 14, right: 18, cursor: "pointer",
-          fontSize: 22, color: C.textMuted, fontWeight: 700, lineHeight: 1,
-        }}>&times;</div>
-
-        <div style={{ fontSize: 48, marginBottom: 16 }}>{"\u{1F44B}"}</div>
-        <h3 style={{ fontSize: 22, fontWeight: 900, marginBottom: 10 }}>
-          Wait — don't leave yet!
-        </h3>
-        <p style={{ fontSize: 14, color: C.textSec, lineHeight: 1.7, marginBottom: 8 }}>
-          You're one message away from getting <span style={{ color: C.accent, fontWeight: 700 }}>free AI trade ideas</span>, a 4-factor scorecard, and a private trading community.
-        </p>
-        <p style={{ fontSize: 13, color: C.textMuted, marginBottom: 24 }}>
-          It takes just 2 minutes to set up. No catch.
-        </p>
-
-        <a href={WA_LINK} target="_blank" rel="noopener" onClick={() => { analytics.track("wa_click", { loc: "exit_popup" }); onClose(); }} className="wa" style={{
-          display: "inline-flex", alignItems: "center", gap: 10,
-          background: C.wa, color: "#fff", padding: "16px 32px",
-          borderRadius: 14, fontWeight: 800, fontSize: 16, textDecoration: "none",
-          boxShadow: `0 4px 24px ${C.wa}30`,
+        {/* Fade edges */}
+        <div style={{
+          position: "absolute", top: 0, left: 0, bottom: 0, width: 80, zIndex: 2,
+          background: `linear-gradient(90deg, ${C.bg}, transparent)`,
+        }} />
+        <div style={{
+          position: "absolute", top: 0, right: 0, bottom: 0, width: 80, zIndex: 2,
+          background: `linear-gradient(270deg, ${C.bg}, transparent)`,
+        }} />
+        <div style={{
+          display: "flex", gap: 0, whiteSpace: "nowrap",
+          animation: "ticker 25s linear infinite",
         }}>
-          <img src="whatsapp.png" alt="" style={{ width: 22, height: 22, objectFit: "contain" }} /> Message Us on WhatsApp
-        </a>
-
-        <p onClick={onClose} style={{
-          fontSize: 12, color: C.textMuted, marginTop: 16, cursor: "pointer",
-          textDecoration: "underline", textUnderlineOffset: 3,
-        }}>
-          No thanks, I'll pass
-        </p>
+          {doubled.map((item, i) => (
+            <span key={i} style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              padding: "4px 24px",
+              fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 500,
+              color: C.textMuted,
+              letterSpacing: 0.5,
+            }}>
+              <span style={{
+                width: 5, height: 5, borderRadius: "50%",
+                background: `linear-gradient(135deg, ${C.accent}, ${C.blue})`,
+                boxShadow: `0 0 6px ${C.accent}40`,
+              }} />
+              {item}
+            </span>
+          ))}
+        </div>
       </div>
+
+      {/* Glowing bottom border */}
+      <div style={{
+        height: 1,
+        background: `linear-gradient(90deg, transparent, ${C.purple}60, ${C.accent}60, ${C.gold}60, transparent)`,
+      }} />
     </div>
   );
 };
 
-function DirectOutreach() {
-  const [openFaq, setOpenFaq] = useState(null);
-  const [exitPopup, setExitPopup] = useState(false);
-  const exitShown = React.useRef(false);
+/* ─── Earnings Calculator with Sliders & Chart ─── */
+const EarningsCalculator = () => {
+  const [users, setUsers] = useState(300);
+  const [lots, setLots] = useState(3);
+  const [ref, inView] = useInView();
 
-  useEffect(() => { analytics.init(); }, []);
+  const tierData = PARTNER_TIERS.map(t => {
+    const u = t.name === "Platinum" ? 2000 : t.max;
+    const monthly = t.rate * u * lots;
+    return { ...t, earnings: monthly, userCount: u };
+  });
 
-  // Exit-intent: fires when mouse leaves the viewport (toward top)
-  useEffect(() => {
-    const handleExit = (e) => {
-      if (e.clientY <= 0 && !exitShown.current) {
-        exitShown.current = true;
-        setExitPopup(true);
-        analytics.track("exit_intent_shown");
-      }
-    };
-    document.addEventListener("mouseleave", handleExit);
-    return () => document.removeEventListener("mouseleave", handleExit);
-  }, []);
+  const currentTier = getPartnerTier(users);
+  const totalLots = users * lots;
+  const monthly = currentTier.rate * totalLots;
+  const annual = monthly * 12;
+  const maxEarnings = Math.max(...tierData.map(t => t.earnings));
 
   return (
-    <div style={{ background: C.bg, color: C.text, minHeight: "100vh", fontFamily: "'Merriweather', serif" }}>
-      <ExitPopup show={exitPopup} onClose={() => setExitPopup(false)} />
+    <ScrollReveal>
+      <div ref={ref} style={{
+        background: C.surface, border: `1px solid ${C.border}`, borderRadius: 22,
+        padding: "40px 32px", marginTop: 50, position: "relative", overflow: "hidden",
+      }}>
+        <div style={{
+          position: "absolute", top: 0, right: 0, width: 280, height: 280,
+          background: `radial-gradient(circle, ${C.accent}08, transparent 70%)`,
+          pointerEvents: "none",
+        }} />
+        <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 6, fontFamily: "'Outfit', sans-serif" }}>
+          Earnings Calculator
+        </div>
+        <div style={{ color: C.textSec, fontSize: 14, marginBottom: 32, fontFamily: "'Space Grotesk', sans-serif" }}>
+          Drag the sliders to see your potential earnings
+        </div>
+
+        {/* Sliders */}
+        <div className="calc-grid-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 28, marginBottom: 32 }}>
+          <div>
+            <label style={{
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+              fontSize: 11, letterSpacing: 1.5, textTransform: "uppercase", color: C.textMuted,
+              marginBottom: 12, fontFamily: "'JetBrains Mono', monospace",
+            }}>
+              <span>Referred Users</span>
+              <span style={{ color: C.accent, fontSize: 18, fontWeight: 700 }}>{users}</span>
+            </label>
+            <div style={{ position: "relative" }}>
+              <input type="range" min={10} max={2500} value={users}
+                onChange={(e) => setUsers(parseInt(e.target.value))}
+                className="custom-slider"
+                style={{ width: "100%" }}
+              />
+              <div style={{
+                position: "absolute", top: 14, left: 0, height: 4, borderRadius: 2,
+                width: `${(users / 2500) * 100}%`, background: `linear-gradient(90deg, ${C.accent}, #00b4d8)`,
+                pointerEvents: "none", boxShadow: `0 0 12px ${C.accent}60`,
+              }} />
+            </div>
+          </div>
+          <div>
+            <label style={{
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+              fontSize: 11, letterSpacing: 1.5, textTransform: "uppercase", color: C.textMuted,
+              marginBottom: 12, fontFamily: "'JetBrains Mono', monospace",
+            }}>
+              <span>Avg Lots / User / Mo</span>
+              <span style={{ color: C.accent, fontSize: 18, fontWeight: 700 }}>{lots}</span>
+            </label>
+            <div style={{ position: "relative" }}>
+              <input type="range" min={1} max={20} step={0.5} value={lots}
+                onChange={(e) => setLots(parseFloat(e.target.value))}
+                className="custom-slider"
+                style={{ width: "100%" }}
+              />
+              <div style={{
+                position: "absolute", top: 14, left: 0, height: 4, borderRadius: 2,
+                width: `${(lots / 20) * 100}%`, background: `linear-gradient(90deg, ${C.accent}, #00b4d8)`,
+                pointerEvents: "none", boxShadow: `0 0 12px ${C.accent}60`,
+              }} />
+            </div>
+          </div>
+        </div>
+
+        {/* Results */}
+        <div className="calc-result-row" style={{
+          display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14, padding: 24,
+          background: `linear-gradient(135deg, ${C.accent}06, ${C.bg})`,
+          borderRadius: 14, border: `1px solid ${C.accent}15`, marginBottom: 28,
+        }}>
+          <div>
+            <div style={{ fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 3 }}>Your Tier</div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: currentTier.color, fontFamily: "'Outfit', sans-serif" }}>{currentTier.name} · ${currentTier.rate}</div>
+          </div>
+          <div>
+            <div style={{ fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 3 }}>Monthly</div>
+            <div style={{ fontSize: 28, fontWeight: 800, color: C.accent, fontFamily: "'Outfit', sans-serif" }}>
+              {inView ? <AnimatedCounter end={monthly} prefix="$" duration={800} trigger={true} /> : "$0"}
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 3 }}>Annual</div>
+            <div style={{ fontSize: 28, fontWeight: 800, color: C.accent, fontFamily: "'Outfit', sans-serif" }}>
+              {inView ? <AnimatedCounter end={annual} prefix="$" duration={800} trigger={true} /> : "$0"}
+            </div>
+            <div style={{ fontSize: 11, color: C.textMuted, marginTop: 1 }}>Recurring. Passive.</div>
+          </div>
+        </div>
+
+        {/* Bar Chart */}
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: 11, letterSpacing: 1.5, textTransform: "uppercase", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 14 }}>
+            Monthly Earnings by Tier (at {lots} lots/user)
+          </div>
+          <div style={{ display: "flex", gap: 8, alignItems: "flex-end", height: 120 }}>
+            {tierData.map((t, i) => {
+              const h = maxEarnings > 0 ? (t.earnings / maxEarnings) * 100 : 0;
+              const isActive = currentTier.name === t.name;
+              return (
+                <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+                  <div style={{
+                    fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: isActive ? C.accent : C.textMuted,
+                    fontWeight: isActive ? 700 : 400, whiteSpace: "nowrap",
+                  }}>
+                    ${(t.earnings / 1000).toFixed(0)}K
+                  </div>
+                  <div style={{
+                    width: "100%", height: `${h}%`, minHeight: 4, borderRadius: 6,
+                    background: isActive
+                      ? `linear-gradient(180deg, ${C.accent}, ${C.accentDark})`
+                      : `linear-gradient(180deg, ${C.border}, ${C.bg})`,
+                    transition: "height 0.6s cubic-bezier(0.16,1,0.3,1), background 0.3s",
+                    boxShadow: isActive ? `0 0 16px ${C.accent}40` : "none",
+                  }} />
+                  <div style={{
+                    fontFamily: "'JetBrains Mono', monospace", fontSize: 9,
+                    color: isActive ? t.color : C.textMuted, fontWeight: 600,
+                  }}>{t.name}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div style={{ fontSize: 12, color: C.textMuted, textAlign: "center", lineHeight: 1.5, fontFamily: "'Space Grotesk', sans-serif" }}>
+          Tier auto-upgrades as your user count grows. All lots across all your users count toward your earnings.
+        </div>
+      </div>
+    </ScrollReveal>
+  );
+};
+
+/* ─── Magnetic Button ─── */
+const MagneticButton = ({ children, href, onClick, style = {} }) => {
+  const btnRef = useRef(null);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [showConfetti, setShowConfetti] = useState(false);
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
+  const handleMouseMove = (e) => {
+    if (isMobile) return;
+    const rect = btnRef.current.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = e.clientX - cx;
+    const dy = e.clientY - cy;
+    setOffset({ x: dx * 0.2, y: dy * 0.2 });
+  };
+
+  const handleMouseLeave = () => setOffset({ x: 0, y: 0 });
+
+  const handleClick = (e) => {
+    setShowConfetti(true);
+    setTimeout(() => setShowConfetti(false), 1200);
+    if (onClick) onClick(e);
+  };
+
+  return (
+    <div style={{ position: "relative", display: "inline-block" }}
+      onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
+      {showConfetti && <ConfettiBurst />}
+      <a ref={btnRef} href={href} target="_blank" rel="noopener" onClick={handleClick} style={{
+        display: "inline-flex", alignItems: "center", gap: 10,
+        transform: `translate(${offset.x}px, ${offset.y}px)`,
+        transition: offset.x === 0 ? "transform 0.5s cubic-bezier(0.16,1,0.3,1)" : "transform 0.08s ease",
+        ...style,
+      }}>
+        {children}
+      </a>
+    </div>
+  );
+};
+
+/* ─── Confetti Burst ─── */
+const ConfettiBurst = () => {
+  const [particles] = useState(() =>
+    Array.from({ length: 24 }, (_, i) => ({
+      x: (Math.random() - 0.5) * 200,
+      y: (Math.random() - 0.5) * 200 - 40,
+      r: Math.random() * 360,
+      color: [C.accent, C.gold, C.blue, C.purple, "#FF6B6B"][Math.floor(Math.random() * 5)],
+      size: Math.random() * 6 + 3,
+      delay: Math.random() * 0.2,
+    }))
+  );
+
+  return (
+    <div style={{
+      position: "absolute", top: "50%", left: "50%", pointerEvents: "none", zIndex: 100,
+    }}>
+      {particles.map((p, i) => (
+        <div key={i} style={{
+          position: "absolute", width: p.size, height: p.size,
+          background: p.color, borderRadius: p.size > 5 ? "50%" : 1,
+          animation: `confetti 0.8s cubic-bezier(0.16,1,0.3,1) ${p.delay}s forwards`,
+          opacity: 0,
+          "--cx": `${p.x}px`, "--cy": `${p.y}px`, "--cr": `${p.r}deg`,
+        }} />
+      ))}
+    </div>
+  );
+};
+
+/* ─── Gradient Orbs ─── */
+const GradientOrbs = () => {
+  return (
+    <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
+      <div className="orb orb-1" style={{
+        position: "absolute", width: 500, height: 500, borderRadius: "50%",
+        background: `radial-gradient(circle, ${C.accent}06, transparent 70%)`,
+        top: "10%", left: "-10%",
+      }} />
+      <div className="orb orb-2" style={{
+        position: "absolute", width: 400, height: 400, borderRadius: "50%",
+        background: `radial-gradient(circle, ${C.purple}06, transparent 70%)`,
+        top: "40%", right: "-10%",
+      }} />
+      <div className="orb orb-3" style={{
+        position: "absolute", width: 600, height: 600, borderRadius: "50%",
+        background: `radial-gradient(circle, ${C.blue}04, transparent 70%)`,
+        bottom: "5%", left: "20%",
+      }} />
+    </div>
+  );
+};
+
+/* ─── Hover Reveal Benefit Card ─── */
+const BenefitCard = ({ IconComp, title, desc, color, delay }) => {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <ScrollReveal delay={delay}>
+      <div
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{
+          background: C.surface, border: `1px solid ${hovered ? color + "40" : C.border}`,
+          borderRadius: 16, padding: "24px 20px",
+          cursor: "default", transition: "all 0.4s cubic-bezier(0.16,1,0.3,1)",
+          transform: hovered ? "translateY(-4px)" : "translateY(0)",
+          boxShadow: hovered ? `0 12px 40px rgba(0,0,0,0.3), 0 0 20px ${color}10` : "none",
+          minHeight: hovered ? 140 : 80,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: hovered ? 12 : 0 }}>
+          <div style={{
+            width: 44, height: 44, minWidth: 44, borderRadius: 12,
+            background: `${color}12`, display: "flex", alignItems: "center", justifyContent: "center",
+            transition: "transform 0.3s", transform: hovered ? "scale(1.1)" : "scale(1)",
+          }}>{IconComp && <IconComp size={22} color={color} />}</div>
+          <h4 style={{ fontSize: 15, fontWeight: 700, fontFamily: "'Outfit', sans-serif" }}>{title}</h4>
+        </div>
+        <div style={{
+          overflow: "hidden", maxHeight: hovered ? 100 : 0,
+          opacity: hovered ? 1 : 0,
+          transition: "max-height 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease",
+        }}>
+          <p style={{ fontSize: 13, color: C.textSec, lineHeight: 1.7, paddingLeft: 58, fontFamily: "'Space Grotesk', sans-serif" }}>{desc}</p>
+        </div>
+      </div>
+    </ScrollReveal>
+  );
+};
+
+
+/* ═══════════════════════════════════════
+   MAIN APP
+   ═══════════════════════════════════════ */
+function PartnerProgram() {
+  const [activeTier, setActiveTier] = useState(2); // Gold default
+  const [heroLoaded, setHeroLoaded] = useState(false);
+
+  useEffect(() => {
+    analytics.init();
+    setTimeout(() => setHeroLoaded(true), 200);
+  }, []);
+
+  const tiers = [
+    { name: "Bronze", color: "#cd7f32", rate: 7, users: "Up to 200", ex: "200 users \u00D7 3 lots avg", val: "$4,200 /mo", highlight: false },
+    { name: "Silver", color: "#c0c0c0", rate: 8, users: "Up to 500", ex: "500 users \u00D7 3 lots avg", val: "$12,000 /mo", highlight: false },
+    { name: "Gold", color: "#ffc44d", rate: 9, users: "Up to 1,000", ex: "1,000 users \u00D7 3 lots avg", val: "$27,000 /mo", highlight: true },
+    { name: "Diamond", color: "#b9f2ff", rate: 10, users: "Up to 1,500", ex: "1,500 users \u00D7 3 lots avg", val: "$45,000 /mo", highlight: false },
+    { name: "Platinum", color: "#e5e4e2", rate: 12, users: "1,500+", ex: "2,000 users \u00D7 3 lots avg", val: "$72,000 /mo", highlight: false },
+  ];
+
+  return (
+    <div style={{ background: C.bg, color: C.text, minHeight: "100vh", fontFamily: "'Space Grotesk', sans-serif" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
         ::selection { background: ${C.accent}40; }
-        @keyframes fadeUp { from { opacity:0; transform:translateY(24px) } to { opacity:1; transform:translateY(0) } }
-        @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:.6 } }
-        @keyframes glow { 0%,100% { box-shadow: 0 0 20px #25D36620 } 50% { box-shadow: 0 0 40px #25D36640 } }
-        .fu { animation: fadeUp .7s ease-out forwards }
-        .fu1 { animation: fadeUp .7s ease-out .1s forwards; opacity:0 }
-        .fu2 { animation: fadeUp .7s ease-out .2s forwards; opacity:0 }
-        .fu3 { animation: fadeUp .7s ease-out .3s forwards; opacity:0 }
-        .wa { transition:all .3s; cursor:pointer }
-        .wa:hover { transform:translateY(-2px); box-shadow:0 8px 40px #25D36650 !important }
-        .feature-card { transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease; cursor: default; }
-        .feature-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 16px 48px rgba(0,0,0,0.4), 0 0 24px rgba(0,229,176,0.08) !important; border-color: #1A274480 !important; }
-        *::-webkit-scrollbar { width:4px }
-        *::-webkit-scrollbar-track { background:transparent }
-        *::-webkit-scrollbar-thumb { background:${C.border}; border-radius:4px }
 
-        /* Tablet */
+        @keyframes blink { 0%,100% { opacity:1 } 50% { opacity:0 } }
+        @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:.5 } }
+        @keyframes glow { 0%,100% { box-shadow: 0 0 20px ${C.accent}30 } 50% { box-shadow: 0 0 50px ${C.accent}50 } }
+        @keyframes glowPulse { 0%,100% { box-shadow: 0 4px 24px ${C.accent}30 } 50% { box-shadow: 0 4px 48px ${C.accent}60 } }
+        @keyframes ticker { 0% { transform:translateX(0) } 100% { transform:translateX(-50%) } }
+        @keyframes float { 0%,100% { transform:translateY(0) } 50% { transform:translateY(-12px) } }
+        @keyframes gradientBorder {
+          0% { background-position: 0% 50% }
+          50% { background-position: 100% 50% }
+          100% { background-position: 0% 50% }
+        }
+        @keyframes confetti {
+          0% { opacity:1; transform:translate(0,0) rotate(0deg) }
+          100% { opacity:0; transform:translate(var(--cx),var(--cy)) rotate(var(--cr)) }
+        }
+        @font-face {
+          font-family: 'Cardot';
+          src: url('cardot/CARDOT.ttf') format('truetype');
+          font-weight: 400;
+          font-style: normal;
+        }
+        @font-face {
+          font-family: 'Cardot';
+          src: url('cardot/CARDOT-Semibold.ttf') format('truetype');
+          font-weight: 600;
+          font-style: normal;
+        }
+
+        @keyframes orbFloat1 { 0%,100% { transform:translate(0,0) } 50% { transform:translate(30px,-20px) } }
+        @keyframes orbFloat2 { 0%,100% { transform:translate(0,0) } 50% { transform:translate(-20px,30px) } }
+        @keyframes orbFloat3 { 0%,100% { transform:translate(0,0) } 50% { transform:translate(15px,20px) } }
+
+        .orb-1 { animation: orbFloat1 12s ease-in-out infinite; }
+        .orb-2 { animation: orbFloat2 15s ease-in-out infinite; }
+        .orb-3 { animation: orbFloat3 18s ease-in-out infinite; }
+
+        .custom-slider {
+          -webkit-appearance: none; appearance: none;
+          height: 4px; border-radius: 2px;
+          background: ${C.border}; outline: none;
+          position: relative; z-index: 2;
+        }
+        .custom-slider::-webkit-slider-thumb {
+          -webkit-appearance: none; appearance: none;
+          width: 20px; height: 20px; border-radius: 50%;
+          background: ${C.accent}; cursor: pointer;
+          box-shadow: 0 0 16px ${C.accent}60, 0 0 4px ${C.accent};
+          border: 2px solid ${C.bg};
+          transition: transform 0.2s;
+        }
+        .custom-slider::-webkit-slider-thumb:hover {
+          transform: scale(1.2);
+        }
+        .custom-slider::-moz-range-thumb {
+          width: 20px; height: 20px; border-radius: 50%;
+          background: ${C.accent}; cursor: pointer;
+          box-shadow: 0 0 16px ${C.accent}60, 0 0 4px ${C.accent};
+          border: 2px solid ${C.bg};
+        }
+
+        .cta-btn { transition: all .3s; cursor: pointer; text-decoration: none; }
+        .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 40px ${C.accent}50 !important; }
+
+        .gradient-border-card {
+          position: relative;
+          background: ${C.surface};
+          border-radius: 18px;
+          overflow: hidden;
+        }
+        .gradient-border-card::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 18px;
+          padding: 1px;
+          background: linear-gradient(135deg, ${C.accent}, ${C.blue}, ${C.purple}, ${C.accent});
+          background-size: 300% 300%;
+          animation: gradientBorder 4s ease infinite;
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+        }
+
+        *::-webkit-scrollbar { width: 4px; }
+        *::-webkit-scrollbar-track { background: transparent; }
+        *::-webkit-scrollbar-thumb { background: ${C.border}; border-radius: 4px; }
+
         @media (max-width: 768px) {
-          .hero-grid { grid-template-columns: 1fr !important; text-align: center; }
-          .hero-grid h1 { font-size: 32px !important; }
-          .hero-grid p { margin-left: auto; margin-right: auto; }
-          .hero-grid .wa { margin-left: auto; margin-right: auto; }
-          .feature-grid { grid-template-columns: 1fr 1fr !important; gap: 14px !important; }
+          .tier-grid { grid-template-columns: 1fr 1fr !important; }
+          .tier-grid > div:last-child { grid-column: 1 / -1; }
+          .calc-grid-row { grid-template-columns: 1fr !important; }
+          .calc-result-row { grid-template-columns: 1fr !important; text-align: center; }
+          .benefit-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
           .steps-row { flex-direction: column !important; gap: 14px !important; }
           .steps-row > div { flex: none !important; width: 100% !important; }
           .nav-inner { padding: 0 16px !important; }
-          .nav-wa-text { display: none; }
-          .nav-wa-btn { padding: 8px 12px !important; }
           .final-cta { padding: 32px 20px !important; }
           .final-cta h2 { font-size: 22px !important; }
-          .faq-section { max-width: 100% !important; }
+          .section-heading { font-size: 24px !important; }
         }
-
-        /* Mobile */
         @media (max-width: 480px) {
-          .hero-grid { gap: 24px !important; padding: 0 16px !important; }
-          .hero-grid h1 { font-size: 26px !important; letter-spacing: -0.5px !important; }
-          .hero-grid p { font-size: 14px !important; }
-          .feature-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
-          .feature-grid > div { min-height: auto !important; padding: 24px 20px !important; }
+          .benefit-grid { grid-template-columns: 1fr !important; gap: 10px !important; }
           .steps-row > div { min-height: auto !important; padding: 24px 20px !important; }
-          .hero-badge { font-size: 9px !important; }
-          .hero-wa-btn { padding: 14px 24px !important; font-size: 14px !important; }
           .section-heading { font-size: 22px !important; }
           .final-cta-wrap { max-width: 100% !important; }
           .final-cta { padding: 28px 16px !important; border-radius: 16px !important; }
           .final-cta h2 { font-size: 20px !important; }
-          .final-cta .wa { padding: 14px 24px !important; font-size: 14px !important; }
-          .faq-item { padding: 14px 16px !important; }
-          .faq-item span:first-child { font-size: 14px !important; }
-          .sticky-wa { font-size: 12px !important; padding: 10px !important; }
+          .hero-heading { font-size: 32px !important; }
         }
       `}</style>
 
-      <StickyWA />
+      <GradientOrbs />
 
+      {/* ─── Nav ─── */}
       <nav style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
         background: `${C.bg}E8`, backdropFilter: "blur(20px)",
         borderBottom: `1px solid ${C.border}`,
       }}>
-        <div className="nav-inner" style={{ maxWidth: 900, margin: "0 auto", padding: "0 24px", display: "flex", justifyContent: "space-between", alignItems: "center", height: 56 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <img src="marketscore logo.png" alt="MarketScore" style={{ width: 44, height: 44, borderRadius: 7, objectFit: "contain" }} />
-            <span style={{ fontWeight: 800, fontSize: 16 }}>MarketScore</span>
+        <div className="nav-inner" style={{
+          maxWidth: 1000, margin: "0 auto", padding: "0 24px",
+          display: "flex", justifyContent: "space-between", alignItems: "center", height: 60,
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <img src="darkmode logo.png" alt="MarketScore" style={{ height: 36, objectFit: "contain" }} />
+            <div style={{ display: "flex", flexDirection: "column", lineHeight: 1, gap: 1 }}>
+              <span style={{ fontWeight: 600, fontSize: 16, fontFamily: "'Cardot', sans-serif", letterSpacing: 1, color: C.text }}>Market</span>
+              <span style={{ fontWeight: 600, fontSize: 16, fontFamily: "'Cardot', sans-serif", letterSpacing: 1, color: C.accent }}>Score</span>
+            </div>
           </div>
-          <a href={WA_LINK} target="_blank" rel="noopener" onClick={() => analytics.track("wa_click", { loc: "nav" })} className="wa nav-wa-btn" style={{
-            background: C.wa, color: "#fff", padding: "8px 20px",
-            borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: "none",
+          <a href="#apply" className="cta-btn" style={{
+            background: C.accent, color: "#000", padding: "9px 22px",
+            borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: "none",
             display: "flex", alignItems: "center", gap: 8,
-          }}><img src="whatsapp.png" alt="WhatsApp" style={{ width: 18, height: 18, objectFit: "contain" }} /> <span className="nav-wa-text">Message MarketScore</span></a>
+            fontFamily: "'Space Grotesk', sans-serif",
+          }}>Apply Now</a>
         </div>
       </nav>
 
-      <section style={{ paddingTop: 96, paddingBottom: 40, position: "relative", overflow: "hidden" }}>
+      {/* ═══ 1. CANVAS HERO ═══ */}
+      <section style={{ position: "relative", minHeight: "100vh", display: "flex", alignItems: "center", overflow: "hidden" }}>
+        <ParticleCanvas />
         <div style={{
-          position: "absolute", top: "-20%", right: "-10%", width: 500, height: 500,
-          borderRadius: "50%", background: `radial-gradient(circle, ${C.wa}06 0%, transparent 70%)`,
-          pointerEvents: "none",
-        }} />
-        <div className="hero-grid" style={{ maxWidth: 900, margin: "0 auto", padding: "0 24px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, alignItems: "center" }}>
-          <div>
-            <div className="fu hero-badge" style={{
-              display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 14px",
-              borderRadius: 100, background: `${C.wa}12`, border: `1px solid ${C.wa}25`, marginBottom: 20,
-            }}>
-              <span style={{ width: 9, height: 9, borderRadius: 5, background: C.wa, animation: "pulse 1.5s infinite" }} />
-              <span style={{ fontSize: 10, fontWeight: 700, color: C.wa, fontFamily: "'Merriweather', serif" }}>
-                Built for traders like you — by traders
-              </span>
-            </div>
-
-            <h1 className="fu1" style={{ fontSize: 42, fontWeight: 900, lineHeight: 1.08, letterSpacing: -1.5 }}>
-              This is going to
-              <br />
-              <span style={{
-                background: `linear-gradient(135deg, ${C.accent}, ${C.blue})`,
-                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-              }}>change how you trade.</span>
-            </h1>
-
-            <p className="fu2" style={{ fontSize: 16, color: C.textSec, marginTop: 16, lineHeight: 1.7, maxWidth: 420 }}>
-              MarketScore gives you AI trade ideas 24/7. A scorecard that scores every instrument
-              across 4 factors. Expert setups. Private community. Forex, Crypto, Indices, Commodities.
-              It's free — just message us to get started.
-            </p>
-
-            <a href={WA_LINK} target="_blank" rel="noopener" onClick={() => analytics.track("wa_click", { loc: "hero" })} className="fu3 wa hero-wa-btn" style={{
-              display: "inline-flex", alignItems: "center", gap: 10, marginTop: 28,
-              background: C.wa, color: "#fff", padding: "16px 32px",
-              borderRadius: 14, fontWeight: 800, fontSize: 16, textDecoration: "none",
-              boxShadow: `0 4px 24px ${C.wa}30`, animation: "glow 3s ease-in-out infinite",
-            }}>
-              <img src="whatsapp.png" alt="" style={{ width: 22, height: 22, objectFit: "contain" }} /> Message Us on WhatsApp
-            </a>
-
-            <p className="fu3" style={{ fontSize: 12, color: C.textMuted, marginTop: 12 }}>
-              We'll personally walk you through setup. Takes 2 minutes.
-            </p>
-          </div>
-
-          <div className="fu3">
-            <LiveScorecard />
-            <div style={{ textAlign: "center", marginTop: 10 }}>
-              <span style={{ fontSize: 10, color: C.accent, fontWeight: 700, fontFamily: "'Merriweather', serif" }}>
-                {"\u2191"} Try it — tap any instrument {"\u2191"}
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section style={{ padding: "48px 0" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 24px" }}>
-          <h2 className="section-heading" style={{ textAlign: "center", fontSize: 28, fontWeight: 900, marginBottom: 8, letterSpacing: -0.5 }}>
-            Here's what you get
-          </h2>
-          <p style={{ textAlign: "center", fontSize: 13, color: C.textSec, marginBottom: 32 }}>
-            All of this is free. No catch.
-          </p>
-          <div className="feature-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-            {[
-              { icon: "ai-robot.png", title: "AI Trade Ideas \u2014 24/7", desc: "AI scans every market around the clock and generates setups. Entry, TP, SL. You wake up to fresh ideas. Even when no one is posting.", color: C.accent },
-              { icon: "target.png", title: "4-Factor Scorecard", desc: "Technical, Fundamental, Sentiment, and COT data. You just tried it above. Every instrument, scored daily. Know the bias before you trade.", color: C.blue },
-              { icon: "lightbulb.png", title: "Expert Trade Ideas", desc: "Vetted providers share structured setups \u2014 entry, TP, SL, scorecard score, and the reasoning behind it. Not screenshots. Real trade ideas.", color: C.gold },
-              { icon: "deal.png", title: "Private Community", desc: "Chat with providers and other traders in real-time. Ask questions. Discuss live trades. No lurkers. No noise. Just traders.", color: C.purple },
-            ].map((f, i) => (
-              <div key={i} className="feature-card" style={{
-                background: C.surface, borderRadius: 18, padding: "32px 28px",
-                border: `1px solid ${C.border}`, minHeight: 200,
-              }}>
-                <div style={{
-                  width: 52, height: 52, borderRadius: 14, marginBottom: 16,
-                  background: "#fff", border: `1px solid ${f.color}20`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <img src={f.icon} alt={f.title} style={{ width: 32, height: 32, objectFit: "contain" }} />
-                </div>
-                <h3 style={{ fontSize: 18, fontWeight: 800, color: f.color, marginBottom: 10 }}>{f.title}</h3>
-                <p style={{ fontSize: 13, color: C.textSec, lineHeight: 1.8 }}>{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section style={{ padding: "48px 0" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 24px" }}>
-          <h2 className="section-heading" style={{ textAlign: "center", fontSize: 24, fontWeight: 900, marginBottom: 28 }}>How to get started</h2>
-          <div className="steps-row" style={{ display: "flex", gap: 20 }}>
-            {[
-              { n: "1", title: "Message Us", desc: "Tap the WhatsApp button. We'll send you the app link and walk you through everything.", icon: "email.png", color: C.wa },
-              { n: "2", title: "Connect Broker", desc: "PU Prime, MH Markets, or Star Trader. Already have one? We'll help you transfer your IB in 2 min.", icon: "link.png", color: C.blue },
-              { n: "3", title: "You're In", desc: "AI trade ideas, scorecard, community, everything \u2014 live instantly.", icon: "check.png", color: C.accent },
-            ].map((s, i) => (
-              <div key={i} className="feature-card" style={{
-                flex: 1, background: C.surface, borderRadius: 18, padding: "28px 24px",
-                border: `1px solid ${C.border}`, textAlign: "center", minHeight: 220,
-              }}>
-                <div style={{
-                  width: 40, height: 40, borderRadius: 20, margin: "0 auto 14px",
-                  background: `${s.color}15`, border: `1px solid ${s.color}30`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 16, fontWeight: 900, color: s.color, fontFamily: "'Merriweather', serif",
-                }}>{s.n}</div>
-                <div style={{
-                  width: 52, height: 52, borderRadius: 14, margin: "0 auto 14px",
-                  background: "#fff", border: `1px solid ${s.color}20`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <img src={s.icon} alt={s.title} style={{ width: 32, height: 32, objectFit: "contain" }} />
-                </div>
-                <h4 style={{ fontSize: 16, fontWeight: 800, marginTop: 8 }}>{s.title}</h4>
-                <p style={{ fontSize: 13, color: C.textSec, marginTop: 8, lineHeight: 1.7 }}>{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section style={{ padding: "48px 0" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 24px" }}>
-          <h2 className="section-heading" style={{ textAlign: "center", fontSize: 28, fontWeight: 900, marginBottom: 32 }}>Quick questions</h2>
-          {[
-            { q: "Is this actually free?", a: "Yes. Everything \u2014 trade ideas, scorecard, community, AI ideas. 100% free. There's a paid tier for power users who want more AI credits ($5/mo), but the free version is the full app." },
-            { q: "What's the catch?", a: "No catch. You connect through a partner broker (PU Prime, MH Markets, or Star Trader) and MarketScore earns a small rebate from the broker on your trading volume. You pay the same spreads as everyone else. That's how it's free for you." },
-            { q: "Do I need to switch brokers?", a: "If you're already with PU Prime, MH Markets, or Star Trader \u2014 just transfer your IB to us. Takes 2 minutes, we'll walk you through it. If you're with someone else, open a free account with any of the 3." },
-            { q: "Is my money safe?", a: "MarketScore never touches your funds. We can't access your account or execute trades for you. Your money stays in your broker account." },
-          ].map((f, i) => (
-            <div key={i} className="faq-item" onClick={() => { setOpenFaq(openFaq === i ? null : i); analytics.track("faq", { q: f.q }); }} style={{
-              background: C.surface, borderRadius: 14, padding: "18px 24px",
-              border: `1px solid ${openFaq === i ? C.accent + "30" : C.border}`,
-              marginBottom: 10, cursor: "pointer",
-              transition: "border-color .3s, box-shadow .3s",
-              boxShadow: openFaq === i ? `0 4px 20px rgba(0,229,176,0.06)` : "none",
-            }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: 16, fontWeight: 700 }}>{f.q}</span>
-                <span style={{ fontSize: 20, color: C.accent, transition: "transform .3s", transform: openFaq === i ? "rotate(45deg)" : "rotate(0)" }}>+</span>
-              </div>
-              {openFaq === i && (
-                <p style={{ fontSize: 14, color: C.textSec, lineHeight: 1.8, marginTop: 14, paddingTop: 14, borderTop: `1px solid ${C.border}` }}>{f.a}</p>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section style={{ padding: "60px 0 100px" }}>
-        <div className="final-cta-wrap" style={{ maxWidth: 520, margin: "0 auto", padding: "0 24px" }}>
-          <div className="final-cta" style={{
-            borderRadius: 24, padding: "44px 32px", textAlign: "center",
-            background: `linear-gradient(135deg, ${C.surface}, ${C.card})`,
-            border: `1px solid ${C.wa}20`, position: "relative", overflow: "hidden",
+          position: "relative", zIndex: 1, maxWidth: 1000, margin: "0 auto",
+          padding: "120px 24px 60px", textAlign: "center", width: "100%",
+        }}>
+          <div style={{
+            opacity: heroLoaded ? 1 : 0, transform: heroLoaded ? "translateY(0)" : "translateY(20px)",
+            transition: "all 0.8s cubic-bezier(0.16,1,0.3,1)",
           }}>
             <div style={{
-              position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)",
-              width: 400, height: 400, borderRadius: "50%",
-              background: `radial-gradient(circle, ${C.wa}06 0%, transparent 60%)`,
-              pointerEvents: "none",
-            }} />
-            <div style={{ position: "relative", zIndex: 1 }}>
-              <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: -1, lineHeight: 1.15 }}>
-                Try it. If you don't like it,
-                <br /><span style={{ color: C.accent }}>you've lost nothing.</span>
-              </h2>
-              <p style={{ fontSize: 13, color: C.textSec, marginTop: 12, maxWidth: 360, margin: "12px auto 0" }}>
-                Message us. We'll set you up personally. 2 minutes and you'll see why
-                traders are switching to MarketScore.
-              </p>
-              <a href={WA_LINK} target="_blank" rel="noopener" onClick={() => analytics.track("wa_click", { loc: "final" })} className="wa" style={{
-                display: "inline-flex", alignItems: "center", gap: 10, marginTop: 24,
-                background: C.wa, color: "#fff", padding: "16px 36px",
-                borderRadius: 14, fontWeight: 800, fontSize: 16, textDecoration: "none",
-                boxShadow: `0 4px 24px ${C.wa}30`, animation: "glow 3s ease-in-out infinite",
+              display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 18px",
+              borderRadius: 100, background: `${C.accent}10`, border: `1px solid ${C.accent}25`,
+              marginBottom: 32,
+            }}>
+              <span style={{ width: 6, height: 6, borderRadius: 3, background: C.accent, animation: "pulse 2s infinite" }} />
+              <span style={{
+                fontSize: 11, fontWeight: 700, color: C.accent, letterSpacing: 2,
+                textTransform: "uppercase", fontFamily: "'JetBrains Mono', monospace",
               }}>
-                <img src="whatsapp.png" alt="WhatsApp" style={{ width: 22, height: 22, objectFit: "contain" }} /> Message MarketScore on WhatsApp
-              </a>
-              <div style={{ marginTop: 14, display: "flex", justifyContent: "center", gap: 14 }}>
-                {["100% free", "Personal setup", "2 minutes"].map((t, i) => (
-                  <span key={i} style={{ fontSize: 10, color: C.textMuted }}>{"\u2713"} {t}</span>
-                ))}
-              </div>
+                Partner Program — Now Open
+              </span>
             </div>
+          </div>
+
+          <h1 className="hero-heading" style={{
+            fontSize: "clamp(36px, 7vw, 72px)", fontWeight: 900, lineHeight: 1.05,
+            letterSpacing: -3, marginBottom: 24,
+            fontFamily: "'Outfit', sans-serif",
+            opacity: heroLoaded ? 1 : 0, transform: heroLoaded ? "translateY(0)" : "translateY(30px)",
+            transition: "all 0.8s cubic-bezier(0.16,1,0.3,1) 0.15s",
+          }}>
+            <Typewriter text="Your Users Trade." speed={60} delay={600} />
+            <br />
+            <span style={{
+              background: `linear-gradient(135deg, ${C.accent}, #00b4d8, ${C.purple})`,
+              backgroundSize: "200% 200%",
+              animation: "gradientBorder 4s ease infinite",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+            }}>
+              <Typewriter text="You Earn Per Lot." speed={60} delay={1800} />
+            </span>
+          </h1>
+
+          <p style={{
+            fontSize: "clamp(16px, 2.2vw, 20px)", color: C.textSec, maxWidth: 580,
+            margin: "0 auto", lineHeight: 1.7, fontFamily: "'Space Grotesk', sans-serif",
+            opacity: heroLoaded ? 1 : 0, transform: heroLoaded ? "translateY(0)" : "translateY(30px)",
+            transition: "all 0.8s cubic-bezier(0.16,1,0.3,1) 0.4s",
+          }}>
+            Refer traders to MarketScore. Every lot they trade earns you up to{" "}
+            <strong style={{ color: C.accent, fontSize: "1.1em", fontFamily: "'JetBrains Mono', monospace" }}>
+              {heroLoaded && <AnimatedCounter end={12} prefix="$" suffix="/lot" duration={2000} />}
+            </strong>
+          </p>
+
+          <div style={{
+            marginTop: 40,
+            opacity: heroLoaded ? 1 : 0, transform: heroLoaded ? "translateY(0)" : "translateY(30px)",
+            transition: "all 0.8s cubic-bezier(0.16,1,0.3,1) 0.6s",
+          }}>
+            <a href="#tiers" className="cta-btn" style={{
+              display: "inline-flex", alignItems: "center", gap: 10,
+              background: C.accent, color: "#000", padding: "16px 36px",
+              borderRadius: 14, fontWeight: 700, fontSize: 16, textDecoration: "none",
+              boxShadow: `0 4px 24px ${C.accent}30`,
+              animation: "glowPulse 3s ease-in-out infinite",
+              fontFamily: "'Space Grotesk', sans-serif",
+            }}>
+              See Earning Tiers <IconArrowDown size={18} color="#000" style={{ marginLeft: 2 }} />
+            </a>
+          </div>
+
+          <div style={{
+            position: "absolute", bottom: 40, left: "50%", transform: "translateX(-50%)",
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+            opacity: heroLoaded ? 1 : 0,
+            transition: "opacity 1s ease 1.5s",
+          }}>
+            <div style={{
+              width: 1, height: 40,
+              background: `linear-gradient(to bottom, ${C.accent}, transparent)`,
+              animation: "pulse 2s infinite",
+            }} />
           </div>
         </div>
       </section>
 
-      <footer style={{ borderTop: `1px solid ${C.border}`, padding: "16px 0" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
-          <p style={{ fontSize: 9, color: C.textMuted, lineHeight: 1.5 }}>
-            MarketScore &copy; 2026. Trade ideas are educational, not investment advice. Trading involves risk.
+      {/* ═══ 2. STATS TICKER ═══ */}
+      <StatsTicker />
+
+      {/* ═══ 3. HOW IT WORKS ═══ */}
+      <section style={{ padding: "80px 0" }}>
+        <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 24px" }}>
+          <ScrollReveal>
+            <div style={{
+              fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: 3,
+              textTransform: "uppercase", color: C.accent, marginBottom: 12, textAlign: "center",
+            }}>How It Works</div>
+            <h2 className="section-heading" style={{
+              textAlign: "center", fontSize: 32, fontWeight: 800, marginBottom: 48,
+              letterSpacing: -1, fontFamily: "'Outfit', sans-serif",
+            }}>
+              Three steps. Recurring income.
+            </h2>
+          </ScrollReveal>
+          <div className="steps-row" style={{ display: "flex", gap: 20 }}>
+            {[
+              { n: "01", title: "Get Your Code", desc: "Sign up as a MarketScore partner. You get a unique referral code (e.g. MS-JOHN) and a branded signup link.", color: C.accent, StepIcon: IconCode },
+              { n: "02", title: "Bring Users In", desc: "Share your code through posts, stories, reels \u2014 your style. Users sign up on MarketScore with your code.", color: C.blue, StepIcon: IconUsers },
+              { n: "03", title: "Earn Every Lot", desc: "Every lot your referred users trade earns you commission. Real-time tracking on your partner dashboard.", color: C.gold, StepIcon: IconTrendingUp },
+            ].map((s, i) => (
+              <ScrollReveal key={i} delay={i * 0.15} style={{ flex: 1 }}>
+                <TiltCard style={{
+                  background: C.surface, borderRadius: 18, padding: "32px 24px",
+                  border: `1px solid ${C.border}`, textAlign: "center", minHeight: 220,
+                  height: "100%",
+                }}>
+                  <div style={{
+                    display: "flex", flexDirection: "column", alignItems: "center", gap: 8, marginBottom: 14,
+                  }}>
+                    <div style={{
+                      width: 52, height: 52, borderRadius: 14,
+                      background: `${s.color}12`, display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>
+                      <s.StepIcon size={26} color={s.color} />
+                    </div>
+                    <span style={{
+                      fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: 700,
+                      color: s.color, opacity: 0.5, letterSpacing: 2,
+                    }}>{s.n}</span>
+                  </div>
+                  <h4 style={{ fontSize: 18, fontWeight: 700, marginBottom: 10, fontFamily: "'Outfit', sans-serif" }}>{s.title}</h4>
+                  <p style={{ fontSize: 14, color: C.textSec, lineHeight: 1.7, fontFamily: "'Space Grotesk', sans-serif" }}>{s.desc}</p>
+                </TiltCard>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ 4. KEY DIFFERENTIATOR ═══ */}
+      <section style={{ padding: "20px 0 60px" }}>
+        <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 24px" }}>
+          <ScrollReveal>
+            <div className="gradient-border-card" style={{ padding: "36px 32px", position: "relative" }}>
+              <div style={{
+                position: "absolute", top: -60, right: -60, width: 220, height: 220,
+                background: `radial-gradient(circle, ${C.accent}08, transparent 70%)`,
+                pointerEvents: "none",
+              }} />
+              <h3 style={{
+                fontSize: 20, fontWeight: 800, marginBottom: 12,
+                display: "flex", alignItems: "center", gap: 10,
+                fontFamily: "'Outfit', sans-serif",
+              }}>
+                <IconTarget size={22} color={C.accent} style={{ marginRight: 4 }} /> Why User Count, Not Followers
+              </h3>
+              <p style={{ fontSize: 15, color: C.textSec, lineHeight: 1.8, fontFamily: "'Space Grotesk', sans-serif" }}>
+                We don't care if you have 10K or 500K followers. Your tier is based on{" "}
+                <strong style={{ color: C.text }}>active referred users trading on MarketScore</strong>.
+                Bring 200 real traders and you're already earning $7/lot. This means{" "}
+                <strong style={{ color: C.text }}>micro-influencers with engaged audiences earn more</strong>{" "}
+                than large accounts with dead followers. Performance wins.
+              </p>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* ═══ 5. COMMISSION TIERS ═══ */}
+      <section id="tiers" style={{ padding: "60px 0" }}>
+        <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 24px" }}>
+          <ScrollReveal>
+            <div style={{
+              fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: 3,
+              textTransform: "uppercase", color: C.accent, marginBottom: 12, textAlign: "center",
+            }}>Commission Tiers</div>
+            <h2 className="section-heading" style={{
+              textAlign: "center", fontSize: 32, fontWeight: 800, marginBottom: 48,
+              letterSpacing: -1, fontFamily: "'Outfit', sans-serif",
+            }}>
+              More users = higher rate per lot.
+            </h2>
+          </ScrollReveal>
+
+          <div className="tier-grid" style={{
+            display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 16,
+          }}>
+            {tiers.map((t, i) => (
+              <ScrollReveal key={i} delay={i * 0.1}>
+                <TiltCard
+                  className="tier-card"
+                  style={{
+                    background: activeTier === i
+                      ? `linear-gradient(160deg, ${C.surface} 40%, ${C.accent}0A 100%)`
+                      : C.surface,
+                    borderRadius: 18, padding: "28px 20px",
+                    border: `1px solid ${activeTier === i ? C.accent + "35" : C.border}`,
+                    cursor: "pointer",
+                    opacity: activeTier === i ? 1 : 0.7,
+                    transition: "opacity 0.3s, border-color 0.3s",
+                    boxShadow: activeTier === i ? `0 0 30px ${C.accent}10` : "none",
+                    height: "100%",
+                  }}
+                >
+                  <div onClick={() => setActiveTier(i)} style={{ position: "relative", zIndex: 2 }}>
+                    <div style={{
+                      marginBottom: 14,
+                      animation: activeTier === i ? "float 3s ease-in-out infinite" : "none",
+                    }}>{(() => { const TierIcon = TIER_ICONS[t.name]; return TierIcon ? <TierIcon size={36} color={t.color} /> : null; })()}</div>
+                    <div style={{
+                      fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: 1.5,
+                      textTransform: "uppercase", fontWeight: 600, color: t.color, marginBottom: 14,
+                    }}>{t.name}</div>
+                    <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 6 }}>
+                      <span style={{
+                        fontSize: 42, fontWeight: 900, letterSpacing: -2,
+                        fontFamily: "'Outfit', sans-serif",
+                        background: `linear-gradient(135deg, ${C.accent}, #00b4d8)`,
+                        WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                      }}>${t.rate}</span>
+                      <span style={{ fontSize: 14, color: C.textMuted }}>/ lot</span>
+                    </div>
+                    <div style={{ fontSize: 13, color: C.textSec, marginBottom: 18, lineHeight: 1.4 }}>
+                      <strong style={{ color: C.text }}>{t.users}</strong> referred users
+                    </div>
+                    <div style={{
+                      background: C.bg, borderRadius: 10, padding: "12px 14px",
+                      fontFamily: "'JetBrains Mono', monospace", fontSize: 11,
+                      overflow: "hidden",
+                      maxHeight: activeTier === i ? 80 : 0,
+                      opacity: activeTier === i ? 1 : 0,
+                      transition: "max-height 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.3s",
+                    }}>
+                      <div style={{ color: C.textMuted, marginBottom: 3 }}>{t.ex}</div>
+                      <div style={{ color: C.gold, fontWeight: 700, fontSize: 15 }}>{t.val}</div>
+                    </div>
+                  </div>
+                </TiltCard>
+              </ScrollReveal>
+            ))}
+          </div>
+
+          {/* ═══ 6. EARNINGS CALCULATOR ═══ */}
+          <EarningsCalculator />
+        </div>
+      </section>
+
+      {/* ═══ 7. WHAT PARTNERS GET ═══ */}
+      <section style={{ padding: "60px 0" }}>
+        <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 24px" }}>
+          <ScrollReveal>
+            <div style={{
+              fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: 3,
+              textTransform: "uppercase", color: C.accent, marginBottom: 12, textAlign: "center",
+            }}>What You Get</div>
+            <h2 className="section-heading" style={{
+              textAlign: "center", fontSize: 32, fontWeight: 800, marginBottom: 48,
+              letterSpacing: -1, fontFamily: "'Outfit', sans-serif",
+            }}>
+              We handle the product. You handle the reach.
+            </h2>
+          </ScrollReveal>
+          <div className="benefit-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            {[
+              { IconComp: IconRadar, title: "AI Signals for Your Users", desc: "Your audience gets MarketScore's AI-powered trading signals \u2014 institutional-grade setups, delivered daily.", color: C.accent },
+              { IconComp: IconBarChart, title: "Real-Time Partner Dashboard", desc: "Track sign-ups, active traders, lots traded, and your earnings. Updated live. Transparent.", color: C.purple },
+              { IconComp: IconPalette, title: "Branded Content Assets", desc: "Ready-to-post stories, reels, and carousels. Designed for engagement. Just post and tag.", color: C.gold },
+              { IconComp: IconShield, title: "Quality & Compliance", desc: "We maintain signal accuracy, platform uptime, and compliance \u2014 your reputation stays clean.", color: C.accent },
+              { IconComp: IconHandshake, title: "User Onboarding Support", desc: "We handle your users' questions, setup, and activation. You bring them in \u2014 we keep them trading.", color: C.purple },
+              { IconComp: IconZap, title: "Monthly Payouts, Zero Fees", desc: "Settled on the 5th of every month. Bank or crypto. Full transparency. No deductions.", color: C.gold },
+            ].map((b, i) => (
+              <BenefitCard key={i} {...b} delay={i * 0.08} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ 8. CTA — MAGNETIC BUTTON ═══ */}
+      <section id="apply" style={{ padding: "60px 0 100px" }}>
+        <div className="final-cta-wrap" style={{ maxWidth: 560, margin: "0 auto", padding: "0 24px" }}>
+          <ScrollReveal>
+            <div className="final-cta" style={{
+              borderRadius: 24, padding: "52px 36px", textAlign: "center",
+              background: `linear-gradient(135deg, ${C.surface}, ${C.card})`,
+              border: `1px solid ${C.accent}20`, position: "relative", overflow: "hidden",
+            }}>
+              <div style={{
+                position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)",
+                width: 400, height: 400, borderRadius: "50%",
+                background: `radial-gradient(circle, ${C.accent}08 0%, transparent 60%)`,
+                pointerEvents: "none",
+              }} />
+              <div style={{ position: "relative", zIndex: 1 }}>
+                <h2 style={{
+                  fontSize: 32, fontWeight: 900, letterSpacing: -1.5, lineHeight: 1.15,
+                  fontFamily: "'Outfit', sans-serif",
+                }}>
+                  Ready to earn?
+                </h2>
+                <p style={{
+                  fontSize: 15, color: C.textSec, marginTop: 14, maxWidth: 440,
+                  margin: "14px auto 0", lineHeight: 1.7, fontFamily: "'Space Grotesk', sans-serif",
+                }}>
+                  No follower minimums. No upfront cost. Just bring traders and earn on every lot they trade.
+                </p>
+                <div style={{ marginTop: 28 }}>
+                  <MagneticButton
+                    href={WA_LINK}
+                    onClick={() => analytics.track("wa_click", { loc: "partner_cta" })}
+                    style={{
+                      background: C.accent, color: "#000", padding: "17px 40px",
+                      borderRadius: 14, fontWeight: 800, fontSize: 17, textDecoration: "none",
+                      boxShadow: `0 4px 24px ${C.accent}30`,
+                      animation: "glowPulse 3s ease-in-out infinite",
+                      fontFamily: "'Space Grotesk', sans-serif",
+                    }}
+                  >
+                    Apply for Partnership <IconArrowRight size={18} color="#000" style={{ marginLeft: 2 }} />
+                  </MagneticButton>
+                </div>
+                <div style={{ marginTop: 18, display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
+                  {["No follower minimum", "Real-time dashboard", "Monthly payouts"].map((t, i) => (
+                    <span key={i} style={{
+                      fontSize: 11, color: C.textMuted, fontFamily: "'Space Grotesk', sans-serif",
+                    }}><IconCheck size={13} color={C.accent} style={{ marginRight: 3 }} /> {t}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      <footer style={{ borderTop: `1px solid ${C.border}`, padding: "18px 0" }}>
+        <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
+          <p style={{ fontSize: 10, color: C.textMuted, lineHeight: 1.5, fontFamily: "'Space Grotesk', sans-serif" }}>
+            <span style={{ color: C.accent, fontWeight: 600, fontFamily: "'Cardot', sans-serif" }}>MarketScore</span> — Partner Program &copy; 2026
           </p>
         </div>
       </footer>
@@ -550,7 +1423,7 @@ function DirectOutreach() {
   );
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<DirectOutreach />);
+ReactDOM.createRoot(document.getElementById("root")).render(<PartnerProgram />);
   </script>
 </body>
 </html>
